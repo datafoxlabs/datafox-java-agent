@@ -26,7 +26,7 @@ payload_sha256:
 
 | 发现 | 证据强度 | 来源 |
 |---|---|---|
-| Splunk 使用发布的上游 Agent 和三种 Configuration，Shadow 分为 relocation、`inst/*.classdata` 隔离、最终组装 | 高：固定 Gradle 源码 | [Gradle 与打包](notes/gradle-and-packaging.md) |
+| Splunk 使用发布的上游 Agent 和三种 Configuration，Shadow 分为 relocation、`inst/*.classdata` 隔离、最终组装 | 高：固定 Gradle 源码 | [Gradle 与打包](notes/gradle-and-packaging.md)、[构建脚本深入解读](notes/build-gradle-deep-dive.md) |
 | `SplunkAgent.premain` 最终委托 `OpenTelemetryAgent.agentmain`，没有重新实现 SDK 初始化 | 高：Java 入口源码 | [Gradle 与打包](notes/gradle-and-packaging.md) |
 | `:custom` 使用 SDK SPI 处理默认配置、Realm/Token、SpanLimits 和发行版资源属性 | 高：Java 源码 | [运行时定制](notes/runtime-customizations.md) |
 | OpAMP 与 Profiler 独立模块，借助 AgentListener 生命周期按需启动 | 高：Java 源码 | [运行时定制](notes/runtime-customizations.md) |
@@ -74,3 +74,4 @@ Research Owner 尚未分配；本 Synthesis 保持草稿，不执行 `conclude-r
 
 - 2026-10-23 — 固定 Splunk v2.32.0 完成 Gradle、运行时、Instrumentation、测试与发布源码研究，形成 Datafox 取舍建议。
 - 2026-10-23 — 根据项目要求明确 Splunk First 的工程结构与 Gradle 打包优先级，关联设计草案；不改变 Research 未批准状态。
+- 2026-10-23 — 补充 build.gradle.kts 深入解读证据，不改变研究状态。
