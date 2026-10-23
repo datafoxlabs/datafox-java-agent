@@ -18,7 +18,7 @@ payload_sha256:
 
 ## Executive Conclusion
 
-针对 OpenTelemetry Java Agent `v2.32.0`，官方提供“独立/内嵌 Extension”和“完整 Distro 重打包”两种不同范围的工程路线。现有证据支持**先以官方 Agent 加最小 Extension 验证发行物**，而不是预先复制全部 Distro Example 模块。该方案只适用于 SDK/SPI 与常规扩展能实现 Datafox 真实需求的情况。
+针对 OpenTelemetry Java Agent `v2.32.0`，官方提供“独立/内嵌 Extension”和“完整 Distro 重打包”两种不同范围的工程路线。项目已明确排除独立或内嵌 Extension 作为发行版打包路线。后续以官方完整 Distro 构建机制为研究主线，验证重定位、类隔离、SPI 合并及最终 Agent JAR 的运行行为。当前尚不能确定 Datafox 所需的最小模块集合。
 
 **成熟度：草稿／证据建设中。** 尚未在 Datafox 仓库实际构建、启动或验证 `-javaagent`。如业务要求新增 Bootstrap 级工具类、Agent 内置库、ClassLoader 可见的 Instrumentation helper，或需要声明式配置等价行为，必须重新评估构建方案。
 
@@ -40,7 +40,7 @@ payload_sha256:
 
 ## Remaining Unknowns
 
-- RQ-005：未运行 Agent 启动、SPI 加载、OTLP 导出或 ClassLoader 边界测试。
+- RQ-005：尚未运行官方 Distro 重打包后的 Agent 启动、SPI 加载、OTLP 导出或 ClassLoader 边界测试。
 - RQ-006：Datafox 的功能、受支持 JVM/框架、标准配置覆盖范围、默认协议和发布要求尚未正式确定。
 - 尚未与 Splunk 或 Microsoft 的实际仓库结构进行对照；本 Research 有意只研究上游。
 
@@ -54,9 +54,9 @@ payload_sha256:
 
 ## Recommendation and Preconditions
 
-优先验证 B，且**只有明确 Extension 功能需求后才新增 custom 模块**；若功能均由上游配置实现，则优先选择 A。C 必须以已确认的 ClassLoader 或 Instrumentation 限制为前提。
+后续仅研究 C（官方 Distro 构建路径）的最小充分实现；A 作为上游对照，B 已被项目要求排除。应按 ClassLoader 边界和实际业务功能决定模块，保留官方 SPI 的使用。
 
-下一阶段用固定 `v2.32.0`/SDK 1.66.0 的 GitHub Actions 原型验证：Gradle 构建可复现、`Premain-Class` 保留、SPI 自动发现、HTTP 请求产生 Span、OTLP 接收结果、显式 `otel.*` 配置不被默认配置覆盖。不得在缺少运行证据时宣布正式架构验收。
+下一阶段用固定 `v2.32.0`/SDK 1.66.0 的 Distro GitHub Actions 原型验证：Gradle 构建可复现、`Premain-Class` 保留、SPI 自动发现、HTTP 请求产生 Span、OTLP 接收结果、显式 `otel.*` 配置不被默认配置覆盖。不得在缺少运行证据时宣布正式架构验收。
 
 ## Handoff to ADR and ExecPlan
 
