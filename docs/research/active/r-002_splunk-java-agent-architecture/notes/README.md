@@ -15,6 +15,7 @@ flowchart LR
 ## 资料目录
 
 <!-- RCTL:NOTES:START -->
+- [Splunk Java Agent build.gradle.kts 深入解读](./build-gradle-deep-dive.md)
 - [Splunk Java Agent 工程流程、测试与发布](./ci-release.md)
 - [Splunk Java Agent 发行版架构与 Gradle 构建](./gradle-and-packaging.md)
 - [Splunk 发行版专有能力与运行时接入机制](./runtime-customizations.md)
