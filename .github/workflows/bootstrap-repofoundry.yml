@@ -1,0 +1,54 @@
+name: Bootstrap RepoFoundryAI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/bootstrap-repofoundry.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repofoundry-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install RepoFoundryAI 0.15.1
+        run: |
+          curl -fsSLo /tmp/repofoundry-install.py https://raw.githubusercontent.com/XiaoWeiKIN/RepoFoundryAI/main/install.py
+          python3 /tmp/repofoundry-install.py --version 0.15.1 --host none
+          "$HOME/.local/bin/repofoundry" --version
+
+      - name: Preview repository Bootstrap
+        run: "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters
+
+      - name: Apply repository Bootstrap
+        run: "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters --apply
+
+      - name: Validate repository Harness
+        run: "$HOME/.local/bin/repofoundry" --repo . validate
+
+      - name: Commit generated Harness
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: bootstrap RepoFoundryAI harness"
+          git push origin HEAD:main
