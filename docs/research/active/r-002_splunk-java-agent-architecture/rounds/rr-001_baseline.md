@@ -25,6 +25,7 @@ owner: "Unassigned"
 ## Evidence Added
 
 - [Gradle 模块、打包与启动入口](../notes/gradle-and-packaging.md)
+- [build.gradle.kts 深入解读](../notes/build-gradle-deep-dive.md)
 - [SDK 配置、Profiler、OpAMP、Instrumentation](../notes/runtime-customizations.md)
 - [CI、兼容性与发布流程](../notes/ci-release.md)
 - [Splunk v2.32.0 源码](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)
