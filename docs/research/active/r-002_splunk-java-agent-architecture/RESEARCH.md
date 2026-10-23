@@ -48,7 +48,7 @@ approval_ref: ""
 - 固定 Splunk `v2.32.0` 标签，确认其 SDK `1.66.0`、Instrumentation `2.32.0`、Gradle `9.8.1` 和 Shadow `9.6.1`。
 - 已核对 `:agent`、`:bootstrap`、`:custom`、`:instrumentation:*`、`:opamp`、`:profiler`、`:dependencyManagement` 的实际代码和依赖。
 - 已确认 Splunk 沿用上游 Distro 的 Shadow 三阶段打包，`SplunkAgent` 仅薄委托给上游 Agent。
-- 详见 [Synthesis](SYNTHESIS.md)、[build.gradle.kts 深入解读](notes/build-gradle-deep-dive.md) 和 [研究资料](notes/README.md)。
+- 阅读入口：[从 Gradle 工程到最终 Agent JAR](notes/gradle-and-packaging.md)；深入源码：[build.gradle.kts 精读](notes/build-gradle-deep-dive.md)；研究结论：[Synthesis](SYNTHESIS.md)。
 - 按项目要求，不创建独立原型，也不在 Research 阶段运行构建、Smoke Test 或性能测试。
 
 ## Research Rounds
@@ -138,3 +138,4 @@ Splunk 既大量复用上游 SPI，也使用 `BeforeAgentListener`、`javaagent-
 
 - 2026-10-23 — 创建 R-002，完成 Splunk v2.32.0 发行版架构的固定源码研究；不开展独立验证。
 - 2026-10-23 — 增补 build.gradle.kts、Configuration、Shadow 三阶段和 Manifest 的源码解读。
+- 2026-10-23 — 将 Gradle 研究笔记重组为渐进式导读，保留独立详细源码分析，提升可读性与查阅效率。
