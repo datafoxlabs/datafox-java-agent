@@ -5,10 +5,10 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 977,
+      "bytes": 1002,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "02a33fabd117e3e85a5784a38a37e34214e9e5cbd7587b56d0149a88a97189a3"
+      "sha256": "f2dbf784452aa0cde99b9ed16f316c21635ebab2748875483c51e74d2b463d50"
     },
     {
       "base": "package",
@@ -26,10 +26,10 @@
     },
     {
       "base": "package",
-      "bytes": 8367,
+      "bytes": 19819,
       "path": "notes/gradle-and-packaging.md",
       "role": "document",
-      "sha256": "b89fa39854f40f66af2714cac94bc6a4c7cbd8109bc323202c446713c4273bf1"
+      "sha256": "79d7b4daaa598122fb7d99d75167bf4ef5bad260d17a809a6b205748f06e0a9c"
     },
     {
       "base": "package",
