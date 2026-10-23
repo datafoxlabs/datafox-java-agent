@@ -26,10 +26,10 @@
     },
     {
       "base": "package",
-      "bytes": 19819,
+      "bytes": 20101,
       "path": "notes/gradle-and-packaging.md",
       "role": "document",
-      "sha256": "79d7b4daaa598122fb7d99d75167bf4ef5bad260d17a809a6b205748f06e0a9c"
+      "sha256": "6e492c4f57f83da56c4dcf367f23667343ca8e12ccc1c66056eecf75bafe3b5b"
     },
     {
       "base": "package",
