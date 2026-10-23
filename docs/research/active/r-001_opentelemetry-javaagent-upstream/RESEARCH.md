@@ -41,14 +41,14 @@ approval_ref: ""
 
 ## Purpose and Decision to Enable
 
-研究 OpenTelemetry Java Instrumentation `v2.32.0` 的启动路径、ClassLoader、扩展 SPI、Gradle Distro 打包与测试约定，为未来决定 Datafox 是嵌入常规 Extension，还是采用完整 Distro 重打包管线提供可复查依据。
+研究 OpenTelemetry Java Instrumentation `v2.32.0` 的启动路径、ClassLoader、扩展 SPI、Gradle Distro 打包与测试约定，为 Datafox 采用官方 Distro 构建路径提供可复查依据。独立或内嵌 Extension 打包方案已由项目要求排除。
 
 ## Current Snapshot
 
 - 已核查固定标签 `v2.32.0` 官方源码和官方文档；对应 SDK `1.66.0`，与正在开发的 `main` 分开。
 - 已确认标准 Extension、嵌入式 Extension 和完整 Distro Example 的设计差异。
 - 当前结论见 [SYNTHESIS.md](SYNTHESIS.md)，具体引用见 [upstream-analysis.md](notes/upstream-analysis.md)。
-- 下一项实验：用 GitHub Actions 固定上游 Agent 和 Gradle 版本，测试最小嵌入式 Extension 的启动、SPI 发现和 OTLP 导出。
+- 下一项实验：用 GitHub Actions 固定上游 Agent 和 Gradle 版本，验证官方 Distro 打包、ClassLoader、Agent 启动和 OTLP 导出。
 - 未决：Datafox 特有功能是否需要 Bootstrap / AgentClassLoader 新增类，以及是否要兼容声明式 YAML 自定义配置。
 
 ## Research Rounds
@@ -71,7 +71,7 @@ approval_ref: ""
 | RQ-002 | answered | 标准 Extension 与完整 Distro 打包的范围差异？ | 标准 Extension 可独立或嵌入；完整 Distro 增加 relocations 与 Agent/Bootstrap 打包 | [Evidence](notes/upstream-analysis.md) |
 | RQ-003 | answered | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；Alpha SPI 无兼容承诺 | [Evidence](notes/upstream-analysis.md) |
 | RQ-004 | answered | 标准配置优先级及声明式配置的差异？ | 属性 supplier 优先级最低；`AutoConfigurationCustomizerProvider` 不适用于声明式 YAML | [Evidence](notes/upstream-analysis.md) |
-| RQ-005 | open | 一个最小嵌入式 Extension 是否通过实际 Agent 启动与遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions 原型 |
+| RQ-005 | open | 官方 Distro 的最小可运行重打包流程能否通过 Agent 启动、ClassLoader 和遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions Distro 原型 |
 | RQ-006 | open | Datafox 已确定功能是否需要 Bootstrap/Agent 类或声明式配置？ | 项目尚无足够功能需求及验收契约 | 需进入功能设计前确认 |
 
 状态枚举：`open`（待研究）、`answered`（已回答）、`deferred`（延后）、`invalidated`（问题前提失效）。
@@ -84,7 +84,7 @@ approval_ref: ""
 
 ## Experiments and Prototypes
 
-当前轮仅源码取证，未执行编译、`-javaagent`、Muzzle 或 OTLP 收集验证。下一轮原型应验证发行物的 JAR Manifest、扩展 SPI 发现、实际遥测输出、用户配置优先级以及 JVM 类加载无冲突；不以构建成功代替运行验证。
+当前轮仅源码取证，未执行编译、`-javaagent`、Muzzle 或 OTLP 收集验证。下一轮原型应验证发行物的 JAR Manifest、Agent/Bootstrap 类隔离、ServiceLoader 注册、实际遥测输出、用户配置优先级以及 JVM 类加载无冲突；不以构建成功代替运行验证。
 
 ## Findings
 
@@ -105,7 +105,7 @@ approval_ref: ""
 - B：在上游 Agent 的 `extensions/` 嵌入独立 Extension。
 - C：按官方 Distro Example 构建并隔离自定义 Bootstrap、Agent 库与 Instrumentation。
 
-初步优先测试 B 的可行性；若没有真正的扩展需求，A 的实现成本更低。只有 B 不满足已确认需求才升级到 C。本轮不批准选择。
+项目已明确排除 B（Extension 打包）路线，后续重点研究 C 的最小充分实现。A 仅作为上游基线对照，不作为发行版候选。具体 Gradle 模块边界与打包细节仍待验证。
 
 ## Blockers
 
@@ -115,7 +115,7 @@ approval_ref: ""
 ## Progress
 
 - [x] (2026-10-23) 以官方 v2.32.0 为基准完成第一轮源码/文档取证。
-- [ ] 在后续 Round 验证嵌入式 Extension 的真实执行路径。
+- [ ] 在后续 Round 验证官方 Distro 的真实打包与运行路径。
 - [ ] 确认 Datafox 首批特有能力和兼容范围，再进入架构决策。
 
 ## Outcome
