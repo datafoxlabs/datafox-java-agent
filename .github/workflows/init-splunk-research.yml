@@ -1,0 +1,35 @@
+name: Initialize Splunk research
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/init-splunk-research.yml
+
+permissions:
+  contents: write
+
+jobs:
+  create-research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get RepoFoundry research tool
+        run: |
+          git clone --depth 1 --branch v0.15.1 https://github.com/XiaoWeiKIN/RepoFoundryAI.git "$RUNNER_TEMP/repofoundry"
+      - name: Create research package
+        run: |
+          RESEARCHCTL="$RUNNER_TEMP/repofoundry/engineering-research/scripts/researchctl.py"
+          python3 "$RESEARCHCTL" --repo . new-research \
+            --slug splunk-java-agent-architecture \
+            --title "Splunk OpenTelemetry Java Agent 发行版架构研究" \
+            --author "ChatGPT (GitHub MCP)" \
+            --research-type comparative
+          python3 "$RESEARCHCTL" --repo . validate
+      - name: Commit research package
+        run: |
+          git add docs/RESEARCH.md docs/research docs/.epctl
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(research): initialize Splunk Java Agent architecture research"
+          git push origin HEAD:main
