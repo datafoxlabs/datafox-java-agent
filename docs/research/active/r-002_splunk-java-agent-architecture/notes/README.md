@@ -1,24 +1,23 @@
-# R-002 Notes
+# R-002 · Splunk Java Agent 架构研究资料
 
-This page is the reading entrypoint for the Research note corpus. Start with
-[RESEARCH.md](../RESEARCH.md) for scope and rounds, then read [SYNTHESIS.md](../SYNTHESIS.md) for the current
-conclusion and downstream handoff.
+本目录记录 Splunk `v2.32.0` 的源码证据。阅读顺序：先看 [Research](../RESEARCH.md) 了解问题与范围，再看 [Synthesis](../SYNTHESIS.md) 获取结论，最后查阅专题证据。
 
 ```mermaid
 flowchart LR
-    Index["notes/README.md<br/>reading map"] --> Research["RESEARCH.md<br/>questions and rounds"]
-    Index --> Notes["Notes<br/>evidence and analysis"]
-    Notes --> Synthesis["SYNTHESIS.md<br/>current conclusion"]
-    Research --> Synthesis
+    A["研究问题"] --> B["Gradle 与打包"]
+    A --> C["运行时定制"]
+    A --> D["CI 与发布"]
+    B --> E["Synthesis"]
+    C --> E
+    D --> E
 ```
 
-## Note inventory
+## 资料目录
 
 <!-- RCTL:NOTES:START -->
-- No note documents yet.
+- [Splunk Gradle 工程、模块与 Agent 打包](./gradle-and-packaging.md)
+- [Splunk 运行时定制、配置与产品能力](./runtime-customizations.md)
+- [Splunk CI、兼容性与发布工程](./ci-release.md)
 <!-- RCTL:NOTES:END -->
 
-The inventory between the `RCTL:NOTES` markers is maintained by `researchctl.py`.
-Content outside those markers may be edited. Remove both markers to take full manual
-ownership of this page; synchronization will then preserve it and validation will
-report any note documents that are not linked here.
+目录标记由 RepoFoundryAI 的 `researchctl` 自动维护。文件名和技术 API 保持原样，文档正文使用中文。
