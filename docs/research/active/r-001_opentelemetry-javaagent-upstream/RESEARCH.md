@@ -46,8 +46,8 @@ approval_ref: ""
 ## Current Snapshot
 
 - 已核查固定标签 `v2.32.0` 官方源码和官方文档；对应 SDK `1.66.0`，与正在开发的 `main` 分开。
-- 已确认标准 Extension、嵌入式 Extension 和完整 Distro Example 的设计差异。
-- 当前结论见 [SYNTHESIS.md](SYNTHESIS.md)，具体引用见 [upstream-analysis.md](notes/upstream-analysis.md)。
+- 已确认官方 Distro Example 的 Gradle 模块、三类依赖 Configuration、Shadow 三阶段打包、Bootstrap 与 Instrumentation/Muzzle 测试边界；项目已排除 Extension JAR 打包方案。
+- 当前结论见 [SYNTHESIS.md](SYNTHESIS.md)，具体引用见 [upstream-analysis.md](notes/upstream-analysis.md) 和 [distro-build-and-test.md](notes/distro-build-and-test.md)。
 - 下一项实验：用 GitHub Actions 固定上游 Agent 和 Gradle 版本，验证官方 Distro 打包、ClassLoader、Agent 启动和 OTLP 导出。
 - 未决：Datafox 特有功能是否需要 Bootstrap / AgentClassLoader 新增类，以及是否要兼容声明式 YAML 自定义配置。
 
@@ -69,7 +69,7 @@ approval_ref: ""
 |---|---|---|---|---|
 | RQ-001 | answered | Agent 的 ClassLoader 与封装边界是什么？ | System/Bootstrap/Agent/Extension 分层；`inst/*.classdata` 与独立 Extension 加载器 | [Evidence](notes/upstream-analysis.md) |
 | RQ-002 | answered | 标准 Extension 与完整 Distro 打包的范围差异？ | 标准 Extension 可独立或嵌入；完整 Distro 增加 relocations 与 Agent/Bootstrap 打包 | [Evidence](notes/upstream-analysis.md) |
-| RQ-003 | answered | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；Alpha SPI 无兼容承诺 | [Evidence](notes/upstream-analysis.md) |
+| RQ-003 | answered | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；`bootstrapLibs`、`javaagentLibs`、`upstreamAgent` 分层，Shadow 依次重定位、隔离、组装；Alpha SPI 无兼容承诺 | [Distro 构建分析](notes/distro-build-and-test.md) |
 | RQ-004 | answered | 标准配置优先级及声明式配置的差异？ | 属性 supplier 优先级最低；`AutoConfigurationCustomizerProvider` 不适用于声明式 YAML | [Evidence](notes/upstream-analysis.md) |
 | RQ-005 | open | 官方 Distro 的最小可运行重打包流程能否通过 Agent 启动、ClassLoader 和遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions Distro 原型 |
 | RQ-006 | open | Datafox 已确定功能是否需要 Bootstrap/Agent 类或声明式配置？ | 项目尚无足够功能需求及验收契约 | 需进入功能设计前确认 |
@@ -80,7 +80,7 @@ approval_ref: ""
 
 以发行标签 `v2.32.0` 的 Java Instrumentation 源码、README、Gradle Kotlin DSL、`VERSIONING.md` 和 OpenTelemetry 官方产品文档为主。记录固定路径和功能契约，区分官方实现事实与对 Datafox 的设计建议；不将 `main` SNAPSHOT 当作已发布行为。
 
-证据地图：[notes/upstream-analysis.md](notes/upstream-analysis.md)。
+证据地图：[上游架构基础](notes/upstream-analysis.md)、[官方 Distro Gradle、打包与测试机制](notes/distro-build-and-test.md)。
 
 ## Experiments and Prototypes
 
@@ -90,8 +90,8 @@ approval_ref: ""
 
 1. 上游 Agent 负责初始化、SDK、Instrumentation 和隔离；Datafox 无需 fork 核心启动器。
 2. 仅通过 Extension SPI 增加自定义能力时，可以使用 `extensions/` 内嵌 JAR 形成单文件发行包。
-3. 完整 Distro 重打包适用于额外 Agent/Bootstrap 类库的隔离需求，包含 relocation 与 `.classdata` 处理。
-4. Alpha 扩展点与声明式配置分支需要版本专属测试。详见 [上游证据](notes/upstream-analysis.md)。
+3. 完整 Distro 的 `javaagentLibs` 先经 relocation 和 SPI 合并，再转为 `inst/*.classdata`；最终 `shadowJar` 合入上游 Agent 与 Bootstrap 库。
+4. 自定义 Instrumentation 使用 ServiceLoader、Helper 注入和 Muzzle；构建期 Muzzle 检查不能代替发行版运行级 Smoke Test。Alpha 扩展点与声明式配置分支需要版本专属测试。详见 [构建与测试证据](notes/distro-build-and-test.md)。
 
 ## Contradictions and Uncertainty
 
@@ -115,6 +115,7 @@ approval_ref: ""
 ## Progress
 
 - [x] (2026-10-23) 以官方 v2.32.0 为基准完成第一轮源码/文档取证。
+- [x] (2026-10-23) 深入核对 Distro Gradle 依赖边界、Shadow 打包、Instrumentation/Muzzle 和 Smoke Test 源码。
 - [ ] 在后续 Round 验证官方 Distro 的真实打包与运行路径。
 - [ ] 确认 Datafox 首批特有能力和兼容范围，再进入架构决策。
 
@@ -127,8 +128,10 @@ approval_ref: ""
 - 证据清单： `docs/research/active/r-001_opentelemetry-javaagent-upstream/RESEARCH_MANIFEST.json`
 - 研究结论： [SYNTHESIS.md](SYNTHESIS.md)
 - 官方源码证据： [notes/upstream-analysis.md](notes/upstream-analysis.md)
+- Distro 构建与测试分析： [notes/distro-build-and-test.md](notes/distro-build-and-test.md)
 - 当前轮次： [rounds/rr-001_baseline.md](rounds/rr-001_baseline.md)
 
 ## Revision Notes
 
 - 2026-10-23 — 用固定上游源码与官方文档完成第一次证据分析，记录开放问题。
+- 2026-10-23 — 补充 Distro Gradle、ClassLoader 打包、Muzzle 和运行级测试证据；保留 RQ-005/RQ-006 为开放问题。
