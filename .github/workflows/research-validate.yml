@@ -1,0 +1,39 @@
+name: Validate RepoFoundry research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research-validate.yml
+      - docs/research/**
+      - docs/RESEARCH.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-validation
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch researchctl v0.15.1
+        run: |
+          git clone --depth 1 --branch v0.15.1 https://github.com/XiaoWeiKIN/RepoFoundryAI.git "$RUNNER_TEMP/repofoundry"
+      - name: Synchronize and validate R-001
+        run: |
+          RESEARCHCTL="$RUNNER_TEMP/repofoundry/engineering-research/scripts/researchctl.py"
+          python3 "$RESEARCHCTL" --repo . sync-research R-001
+          python3 "$RESEARCHCTL" --repo . validate
+      - name: Commit generated research indexes
+        run: |
+          git add docs/research docs/RESEARCH.md docs/.epctl
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(research): synchronize evidence manifest"
+          git push origin HEAD:main
