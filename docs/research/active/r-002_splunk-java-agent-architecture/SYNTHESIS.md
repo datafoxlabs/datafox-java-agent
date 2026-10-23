@@ -55,7 +55,7 @@ payload_sha256:
 
 ## Recommendation and Preconditions
 
-以官方 Distro `v2.32.0` 为技术契约，以 Splunk `v2.32.0` 为生产级工程组织参考：
+**项目工程优先级已明确：以 Splunk `v2.32.0` 的工程结构与 Gradle 打包为第一参考，以 OpenTelemetry 官方 Distro `v2.32.0` 为 ClassLoader、Agent 生命周期和 SPI 的技术契约依据。** 具体设计如下：
 
 1. 保留 `upstreamAgent`、`bootstrapLibs`、`javaagentLibs` 的 ClassLoader 构建边界和官方 Shadow 三阶段流程。
 2. 优先保留上游 `OpenTelemetryAgent` 入口；除非存在启动前逻辑需求，不引入 Splunk 式自定义 `premain`。
@@ -66,10 +66,11 @@ payload_sha256:
 
 ## Handoff to ADR and ExecPlan
 
-R-002 可以作为后续 Datafox Gradle 架构设计的事实依据，但**不构成 ADR 批准或代码实施授权**。后续工程设计应同时引用 [R-001 官方 Distro 研究](../../r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md) 与本研究；决定模块时应逐项说明业务需求、依赖边界、可替代的上游能力和新增维护成本。
+用户已明确优先参考 Splunk 的工程结构与 Gradle 打包；对应的 [Datafox Gradle 工程设计草案](../../../design-docs/datafox-gradle-distribution.md) 记录规划。R-002 作为后续 Datafox Gradle 架构设计的事实依据，但**不构成 ADR 批准或代码实施授权**。后续工程设计应同时引用 [R-001 官方 Distro 研究](../../r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md) 与本研究；决定模块时应逐项说明业务需求、依赖边界、可替代的上游能力和新增维护成本。
 
 Research Owner 尚未分配；本 Synthesis 保持草稿，不执行 `conclude-research`。正式实施阶段再执行必要构建和运行验收，不在研究阶段另做原型。
 
 ## Revision Notes
 
 - 2026-10-23 — 固定 Splunk v2.32.0 完成 Gradle、运行时、Instrumentation、测试与发布源码研究，形成 Datafox 取舍建议。
+- 2026-10-23 — 根据项目要求明确 Splunk First 的工程结构与 Gradle 打包优先级，关联设计草案；不改变 Research 未批准状态。
