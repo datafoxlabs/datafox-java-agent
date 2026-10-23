@@ -27,6 +27,7 @@ flowchart LR
 - [Splunk Java Agent 工程流程、测试与发布](./ci-release.md)
 - [读懂 Splunk Java Agent：从 Gradle 工程到一个可运行的 Agent JAR](./gradle-and-packaging.md)
 - [Splunk 发行版专有能力与运行时接入机制](./runtime-customizations.md)
+- [Splunk Shadow 构建插件精读：为什么这样重定位、合并和隔离？](./shadow-conventions-source-walkthrough.md)
 <!-- RCTL:NOTES:END -->
 
 目录标记由 RepoFoundryAI 的 `researchctl` 自动维护。文件名和技术 API 保持原样，文档正文使用中文。

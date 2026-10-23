@@ -5,10 +5,10 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 1864,
+      "bytes": 1993,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "fb0757bdd2b49e63a2fa64f13ddfe96bd30699ff26f4c76bf7b4193429df3c65"
+      "sha256": "e910fd447aa5a6395fa3f41fa6e10b9a6c60caa1d800f87bf58994a9e2e89923"
     },
     {
       "base": "package",
@@ -37,6 +37,13 @@
       "path": "notes/runtime-customizations.md",
       "role": "document",
       "sha256": "e5a44c6447208caf8e00ff3b442c7e2d5563618608515db5e104d965fa216891"
+    },
+    {
+      "base": "package",
+      "bytes": 20159,
+      "path": "notes/shadow-conventions-source-walkthrough.md",
+      "role": "document",
+      "sha256": "59e5e295465c28b4e0c61f4b57a4f1bdcd2020992113aa1396a761895804abdc"
     },
     {
       "base": "package",
