@@ -1,0 +1,35 @@
+name: Initialize upstream research
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/init-upstream-research.yml
+
+permissions:
+  contents: write
+
+jobs:
+  create-research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install RepoFoundry research tooling
+        run: |
+          git clone --depth 1 --branch v0.15.1 https://github.com/XiaoWeiKIN/RepoFoundryAI.git "$RUNNER_TEMP/repofoundry"
+      - name: Initialize persistent research package
+        run: |
+          RESEARCHCTL="$RUNNER_TEMP/repofoundry/engineering-research/scripts/researchctl.py"
+          python3 "$RESEARCHCTL" --repo . new-research \
+            --slug opentelemetry-javaagent-upstream \
+            --title "OpenTelemetry Java Agent upstream architecture" \
+            --author "ChatGPT (GitHub MCP)" \
+            --research-type architecture
+          python3 "$RESEARCHCTL" --repo . validate
+      - name: Commit research scaffold
+        run: |
+          git add docs/RESEARCH.md docs/research docs/.epctl
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: initialize upstream Java Agent research"
+          git push origin HEAD:main
