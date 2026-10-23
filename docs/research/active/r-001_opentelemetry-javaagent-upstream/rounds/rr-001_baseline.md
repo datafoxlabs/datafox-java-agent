@@ -25,13 +25,14 @@ owner: "Unassigned"
 ## Evidence Added
 
 - [上游证据](../notes/upstream-analysis.md)：官方 Javaagent Structure、Distro/Extension Example、Gradle、版本兼容、测试与配置。
+- [Distro 构建与测试分析](../notes/distro-build-and-test.md)：官方三种 Configuration、Shadow 三阶段打包、Bootstrap、Instrumentation/Muzzle、测试 Agent 和 Smoke Test。
 - [固定版本 Distro 示例](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/v2.32.0/examples/distro)
 - [固定版本 Extension 示例](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/v2.32.0/examples/extension)
 - [官方 Agent 扩展文档](https://opentelemetry.io/docs/zero-code/java/agent/extensions/)
 
 ## Synthesis Delta
 
-首次形成证据摘要：项目明确选择官方 Distro 构建路径作为后续研究范围；仍需验证完整打包机制，并按业务需要精简模块。
+在项目排除 Extension JAR 打包路径后，进一步从官方固定版本源码确认 Distro 的完整打包依赖关系、ServiceLoader 合并、ClassLoader 隔离与测试机制。尚未实际执行构建或运行，因此保留 RQ-005。
 
 ## Next Inquiry
 
@@ -41,4 +42,4 @@ owner: "Unassigned"
 
 ## Round Outcome
 
-本轮已完成文档取证；研究保持 active，后续需运行级别证据和业务范围。
+本轮已完成 Distro Gradle 与测试体系的源码取证；研究保持 active，后续需运行级别证据和业务范围。
