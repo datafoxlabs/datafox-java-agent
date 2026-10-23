@@ -33,13 +33,16 @@ jobs:
           "$HOME/.local/bin/repofoundry" --version
 
       - name: Preview repository Bootstrap
-        run: "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters
+        run: |
+          "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters
 
       - name: Apply repository Bootstrap
-        run: "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters --apply
+        run: |
+          "$HOME/.local/bin/repofoundry" --repo . bootstrap --all-adapters --apply
 
       - name: Validate repository Harness
-        run: "$HOME/.local/bin/repofoundry" --repo . validate
+        run: |
+          "$HOME/.local/bin/repofoundry" --repo . validate
 
       - name: Commit generated Harness
         run: |
