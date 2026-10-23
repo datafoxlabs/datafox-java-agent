@@ -111,7 +111,6 @@ Allowed statuses: `open`, `answered`, `deferred`, `invalidated`.
 
 | ID | Status | Opened | Resolved | Missing capability | Impact | Unblock or resolution |
 |---|---|---|---|---|---|---|
-| B-001 | open | 2026-10-23 | | 运行级别的打包与 SPI 验证 | 不能交付可接受的正式发行版架构决定 | GitHub Actions 构建和 smoke test |
 
 ## Progress
 
