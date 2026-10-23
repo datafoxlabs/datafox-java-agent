@@ -16,7 +16,7 @@ owner: "Unassigned"
 
 ## Focus and Questions
 
-固定官方发行版本 `v2.32.0`，确定 RQ-001~RQ-004 的 ClassLoader、构建、SPI 和配置事实；保留 RQ-005（运行验证）和 RQ-006（业务需求）为下一轮输入。
+固定官方发行版本 `v2.32.0`，确定 RQ-001~RQ-004 的 ClassLoader、构建、SPI 和配置事实；保留 RQ-005（Distro 运行验证）和 RQ-006（业务需求）为下一轮输入。项目已明确排除 Extension 打包方案。
 
 ## Scope
 
@@ -31,12 +31,12 @@ owner: "Unassigned"
 
 ## Synthesis Delta
 
-首次形成证据摘要：建议将普通 Extension 路径作为优先验证项，完整 Distro 打包仅作为满足额外 Agent/Bootstrap 需求时的方案；研发结论尚未获准实施。
+首次形成证据摘要：项目明确选择官方 Distro 构建路径作为后续研究范围；仍需验证完整打包机制，并按业务需要精简模块。
 
 ## Next Inquiry
 
-1. 在 GitHub Actions 构建固定版本的最小扩展并产出嵌入式 Java Agent。
-2. 使用 `-javaagent` 启动一个最小 Java 应用，验证 SPI 注册、Span 产生与 OTLP 输出。
+1. 在 GitHub Actions 构建固定版本的最小官方 Distro Agent。
+2. 使用 `-javaagent` 启动一个最小 Java 应用，验证 Agent/Bootstrap 隔离、SPI 注册、Span 产生与 OTLP 输出。
 3. 根据 Datafox 明确功能选择是否需要 Declarative 配置适配、自定义 Instrumentation 或 Bootstrap class。
 
 ## Round Outcome
