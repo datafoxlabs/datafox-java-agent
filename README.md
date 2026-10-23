@@ -9,18 +9,11 @@ Custom OpenTelemetry Java Agent distribution.
 - Keep distribution-specific logic minimal and compatible with upstream upgrades.
 - Reuse standard `otel.*` configuration; reserve `datafox.*` for distribution-specific settings when needed.
 
-## Repository bootstrap
+## Repository Harness
 
-The repository is prepared for [RepoFoundry AI](https://github.com/XiaoWeiKIN/RepoFoundryAI). Install its CLI, then preview, apply and validate the official repository Harness:
+The repository Harness was initialized using [RepoFoundry AI](https://github.com/XiaoWeiKIN/RepoFoundryAI) 0.15.1. Its project instructions, adapter entrypoints, and validation configuration are committed in this repository.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/XiaoWeiKIN/RepoFoundryAI/main/install.py | python3 -
-repofoundry --repo . bootstrap --all-adapters
-repofoundry --repo . bootstrap --all-adapters --apply
-repofoundry --repo . validate
-```
-
-Review any reported conflicts before applying. The RepoFoundry Harness is not yet installed in this repository.
+Development uses GitHub MCP for repository changes and GitHub Actions for commands that require an execution environment. The [Bootstrap workflow](.github/workflows/bootstrap-repofoundry.yml) installs the RepoFoundryAI CLI on an ephemeral GitHub-hosted runner, previews the requested changes, applies them, validates the Harness, and commits generated files. It can also be invoked manually with `workflow_dispatch`. A local toolchain is not required.
 
 ## Build
 
