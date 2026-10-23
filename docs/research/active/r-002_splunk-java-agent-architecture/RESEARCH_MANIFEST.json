@@ -5,10 +5,10 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 1993,
+      "bytes": 2277,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "e910fd447aa5a6395fa3f41fa6e10b9a6c60caa1d800f87bf58994a9e2e89923"
+      "sha256": "78d29a8392132cb13713c2366ed5b1ebefc5bba9b2695683d97c1fa0b9edb9ea"
     },
     {
       "base": "package",
