@@ -26,18 +26,18 @@ approval_ref: ""
 
 ## Research Metadata
 
-| 字段 | 内容 |
+| Field | Value |
 |---|---|
-| 创建日期 | 2026-10-23 |
-| 更新日期 | 2026-10-23 |
-| 研究类型 | 架构研究 |
-| 研究负责人 | 未分配 |
-| 编写者 | ChatGPT (GitHub MCP) |
-| 生命周期 | 进行中 |
-| 成熟度 | 证据建设中 |
-| 当前轮次 | RR-001 |
-| 结论修订版 | v0 |
-| 批准状态 | 待批准 |
+| Date | 2026-10-23 |
+| Last Updated | 2026-10-23 |
+| Research Type | Architecture |
+| Research Owner | Unassigned |
+| Author | ChatGPT (GitHub MCP) |
+| Lifecycle | active |
+| Maturity | evidence_building |
+| Current Round | RR-001 |
+| Synthesis Revision | v0 |
+| Approval | Pending |
 
 ## Purpose and Decision to Enable
 

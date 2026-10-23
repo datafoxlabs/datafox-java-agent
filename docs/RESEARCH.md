@@ -21,7 +21,7 @@ approval plus a sealed `SYNTHESIS.md`.
 <!-- RCTL:ACTIVE:START -->
 | ID | Title | Type | Status | Maturity | Owner | Updated | Synthesis | Path |
 |---|---|---|---|---|---|---|---|---|
-| R-001 | OpenTelemetry Java Agent upstream architecture | Architecture | active | evidence_building | Unassigned | 2026-10-23 | [Synthesis](research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md) | [Research](research/active/r-001_opentelemetry-javaagent-upstream/RESEARCH.md) |
+| R-001 | OpenTelemetry Java Agent 官方上游架构研究 | Architecture | active | evidence_building | Unassigned | 2026-10-23 | [Synthesis](research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md) | [Research](research/active/r-001_opentelemetry-javaagent-upstream/RESEARCH.md) |
 <!-- RCTL:ACTIVE:END -->
 
 ## Completed

@@ -19,10 +19,10 @@
     },
     {
       "base": "package",
-      "bytes": 1992,
+      "bytes": 1979,
       "path": "rounds/rr-001_baseline.md",
       "role": "round",
-      "sha256": "43fb56749e2c198e9eb78f7535008236938c5e4cc27c8f80118240b2806d3662"
+      "sha256": "08e377feb32be752e12e4d3131f1624bc5cc48b02a9bbd0013f09443f4f053e0"
     }
   ],
   "entrypoints": [
@@ -64,6 +64,6 @@
   ],
   "schema_version": "1.1",
   "status": "active",
-  "title": "OpenTelemetry Java Agent upstream architecture — Research manifest",
+  "title": "OpenTelemetry Java Agent 官方上游架构研究 — Research manifest",
   "updated": "2026-10-23"
 }
