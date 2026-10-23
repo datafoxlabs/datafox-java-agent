@@ -5,7 +5,7 @@ artifact_type: research
 id: R-001
 title: "OpenTelemetry Java Agent upstream architecture"
 status: active
-maturity: exploratory
+maturity: evidence_building
 research_type: architecture
 synthesis: SYNTHESIS.md
 manifest: RESEARCH_MANIFEST.json
@@ -22,11 +22,7 @@ approval_ref: ""
 
 # OpenTelemetry Java Agent upstream architecture
 
-This controller is the bounded entrypoint for a multi-document Research
-package. Keep current questions, routes, findings, and next actions here. Put
-focused analysis in the declared corpus, raw evidence in `artifacts/`, and the
-current decision-ready view in `SYNTHESIS.md`. Decision readiness never grants
-permission to conclude or archive the Research.
+本 Research 为 Datafox Java Agent 的工程架构选择建立上游证据。当前为调查阶段；不能把建议直接视为已接受的 ADR。
 
 ## Research Metadata
 
@@ -38,92 +34,102 @@ permission to conclude or archive the Research.
 | Research Owner | Unassigned |
 | Author | ChatGPT (GitHub MCP) |
 | Lifecycle | active |
-| Maturity | exploratory |
+| Maturity | evidence_building |
 | Current Round | RR-001 |
 | Synthesis Revision | v0 |
 | Approval | Pending |
 
 ## Purpose and Decision to Enable
 
-<!-- REQUIRED: State the feature question, why the decision matters, and what downstream decision this Research must enable. -->
+研究 OpenTelemetry Java Instrumentation `v2.32.0` 的启动路径、ClassLoader、扩展 SPI、Gradle Distro 打包与测试约定，为未来决定 Datafox 是嵌入常规 Extension，还是采用完整 Distro 重打包管线提供可复查依据。
 
 ## Current Snapshot
 
-<!-- REQUIRED: State what is known, the exact next inquiry or experiment, and any open blocker. -->
-
-- Current state: `<concise evidence-based state>`.
-- Next inquiry: `<exact source, command, experiment, or synthesis action>`.
-- Open blockers: none.
+- 已核查固定标签 `v2.32.0` 官方源码和官方文档；对应 SDK `1.66.0`，与正在开发的 `main` 分开。
+- 已确认标准 Extension、嵌入式 Extension 和完整 Distro Example 的设计差异。
+- 当前结论见 [SYNTHESIS.md](SYNTHESIS.md)，具体引用见 [upstream-analysis.md](notes/upstream-analysis.md)。
+- 下一项实验：用 GitHub Actions 固定上游 Agent 和 Gradle 版本，测试最小嵌入式 Extension 的启动、SPI 发现和 OTLP 导出。
+- 未决：Datafox 特有功能是否需要 Bootstrap / AgentClassLoader 新增类，以及是否要兼容声明式 YAML 自定义配置。
 
 ## Research Rounds
 
-Use one round for one bounded pass over the shared Research purpose. A round
-may add or reopen Research Questions and may reference any number of corpus
-documents.
-
 | Round | Focus | Status | Author | Started | Evidence and outcome |
 |---|---|---|---|---|---|
-| RR-001 | Baseline investigation | active | ChatGPT (GitHub MCP) | 2026-10-23 | `rounds/rr-001_baseline.md` |
+| RR-001 | 上游源码与两种打包方式 | active | ChatGPT (GitHub MCP) | 2026-10-23 | [Baseline](rounds/rr-001_baseline.md), [Evidence](notes/upstream-analysis.md) |
 
 ## Scope and Non-goals
 
-<!-- REQUIRED: Define what this Research covers and what it intentionally excludes. -->
+范围：官方发行版概念、Agent 启动、ClassLoader、安全扩展点、Gradle 打包依赖、配置覆盖优先级、测试方式和上游升级风险。
+
+本轮不分析 Splunk/Microsoft，不实现 Java 工程，不选择 Datafox 长期模块布局，不作性能、兼容性或安全承诺，不批准 ADR。
 
 ## Research Questions
 
-<!-- REQUIRED: Keep every decision-relevant question in this table. Concluded Research cannot contain open questions. -->
-
 | ID | Status | Question | Answer or disposition | Evidence |
 |---|---|---|---|---|
-| RQ-001 | open | `<decision-relevant question>` |  |  |
+| RQ-001 | answered | Agent 的 ClassLoader 与封装边界是什么？ | System/Bootstrap/Agent/Extension 分层；`inst/*.classdata` 与独立 Extension 加载器 | [Evidence](notes/upstream-analysis.md) |
+| RQ-002 | answered | 标准 Extension 与完整 Distro 打包的范围差异？ | 标准 Extension 可独立或嵌入；完整 Distro 增加 relocations 与 Agent/Bootstrap 打包 | [Evidence](notes/upstream-analysis.md) |
+| RQ-003 | answered | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；Alpha SPI 无兼容承诺 | [Evidence](notes/upstream-analysis.md) |
+| RQ-004 | answered | 标准配置优先级及声明式配置的差异？ | 属性 supplier 优先级最低；`AutoConfigurationCustomizerProvider` 不适用于声明式 YAML | [Evidence](notes/upstream-analysis.md) |
+| RQ-005 | open | 一个最小嵌入式 Extension 是否通过实际 Agent 启动与遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions 原型 |
+| RQ-006 | open | Datafox 已确定功能是否需要 Bootstrap/Agent 类或声明式配置？ | 项目尚无足够功能需求及验收契约 | 需进入功能设计前确认 |
 
 Allowed statuses: `open`, `answered`, `deferred`, `invalidated`.
 
 ## Method and Sources
 
-<!-- REQUIRED: Record source-selection logic, repository paths, authoritative documents, and how claims will be checked. -->
+以发行标签 `v2.32.0` 的 Java Instrumentation 源码、README、Gradle Kotlin DSL、`VERSIONING.md` 和 OpenTelemetry 官方产品文档为主。记录固定路径和功能契约，区分官方实现事实与对 Datafox 的设计建议；不将 `main` SNAPSHOT 当作已发布行为。
+
+证据地图：[notes/upstream-analysis.md](notes/upstream-analysis.md)。
 
 ## Experiments and Prototypes
 
-<!-- REQUIRED: Record hypotheses, reproducible commands or procedures, observations, and promotion/discard criteria. Write "None required" with a reason when no experiment is needed. -->
+当前轮仅源码取证，未执行编译、`-javaagent`、Muzzle 或 OTLP 收集验证。下一轮原型应验证发行物的 JAR Manifest、扩展 SPI 发现、实际遥测输出、用户配置优先级以及 JVM 类加载无冲突；不以构建成功代替运行验证。
 
 ## Findings
 
-<!-- REQUIRED: Keep concise supported findings and point to manifest documents. -->
+1. 上游 Agent 负责初始化、SDK、Instrumentation 和隔离；Datafox 无需 fork 核心启动器。
+2. 仅通过 Extension SPI 增加自定义能力时，可以使用 `extensions/` 内嵌 JAR 形成单文件发行包。
+3. 完整 Distro 重打包适用于额外 Agent/Bootstrap 类库的隔离需求，包含 relocation 与 `.classdata` 处理。
+4. Alpha 扩展点与声明式配置分支需要版本专属测试。详见 [上游证据](notes/upstream-analysis.md)。
 
 ## Contradictions and Uncertainty
 
-<!-- REQUIRED: State conflicting evidence, limitations, confidence boundaries, and unknowns that remain. -->
+官方 Distro Example 是全面能力展示，不意味着每个发行版都必须拥有其全部子模块。官方 SDK AutoConfiguration SPI 对声明式 YAML 并不等价。对当前仓库未执行 Agent 原型，打包兼容结论限于上游源码与文档，不构成 Datafox 实测。
 
 ## Decision Drivers and Options
 
-<!-- REQUIRED: Identify the criteria that will rank viable options and list those options without making the final architectural decision here. -->
+以 API 合规、JVM ClassLoader 边界、最小新增代码、升级成本、运行验证和所需特有能力作为比较标准：
+
+- A：仅发行上游 Agent，增加元数据与发行脚本。
+- B：在上游 Agent 的 `extensions/` 嵌入独立 Extension。
+- C：按官方 Distro Example 构建并隔离自定义 Bootstrap、Agent 库与 Instrumentation。
+
+初步优先测试 B 的可行性；若没有真正的扩展需求，A 的实现成本更低。只有 B 不满足已确认需求才升级到 C。本轮不批准选择。
 
 ## Blockers
 
 | ID | Status | Opened | Resolved | Missing capability | Impact | Unblock or resolution |
 |---|---|---|---|---|---|---|
+| B-001 | open | 2026-10-23 | | 运行级别的打包与 SPI 验证 | 不能交付可接受的正式发行版架构决定 | GitHub Actions 构建和 smoke test |
 
 ## Progress
 
-- [ ] (2026-10-23T02:31:09Z) Research created; answer or explicitly dispose every
-  question before conclusion.
+- [x] (2026-10-23) 以官方 v2.32.0 为基准完成第一轮源码/文档取证。
+- [ ] 在后续 Round 验证嵌入式 Extension 的真实执行路径。
+- [ ] 确认 Datafox 首批特有能力和兼容范围，再进入架构决策。
 
 ## Outcome
 
-Research is active. A review-ready Synthesis remains active until the Research
-Owner explicitly authorizes conclusion. Cancellation also requires explicit
-authorization and a reason.
+Research 保持 active，Synthesis 仍为 draft。没有 Research Owner 的明确授权，不进行 `conclude-research`、ADR 批准或项目架构落地。
 
 ## Artifacts and Notes
 
 - Manifest: `docs/research/active/r-001_opentelemetry-javaagent-upstream/RESEARCH_MANIFEST.json`
-- Synthesis: `docs/research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md`
-- Round controllers belong under `rounds/`; managed analysis belongs under
-  `notes/`; sparse, immutable Synthesis milestone snapshots belong under
-  `snapshots/`; raw logs, benchmarks, traces and captures belong under
-  `artifacts/`.
+- Synthesis: [SYNTHESIS.md](SYNTHESIS.md)
+- Official evidence: [notes/upstream-analysis.md](notes/upstream-analysis.md)
+- Current round: [rounds/rr-001_baseline.md](rounds/rr-001_baseline.md)
 
 ## Revision Notes
 
-- 2026-10-23T02:31:09Z — Initial Research package created.
+- 2026-10-23 — 用固定上游源码与官方文档完成第一次证据分析，记录开放问题。
