@@ -1,4 +1,6 @@
 {
-  "high_water": {},
+  "high_water": {
+    "R": 1
+  },
   "version": 1
 }

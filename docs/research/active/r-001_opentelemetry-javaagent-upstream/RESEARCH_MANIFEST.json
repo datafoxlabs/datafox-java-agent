@@ -1,0 +1,62 @@
+{
+  "artifact_type": "research-manifest",
+  "author": "ChatGPT (GitHub MCP)",
+  "created": "2026-10-23",
+  "documents": [
+    {
+      "base": "package",
+      "bytes": 906,
+      "path": "notes/README.md",
+      "role": "entrypoint",
+      "sha256": "5ed7595de519e75ef0bc7910ed64cda0a815e49da1a57684b09c95ddce7a2eb0"
+    },
+    {
+      "base": "package",
+      "bytes": 1122,
+      "path": "rounds/rr-001_baseline.md",
+      "role": "round",
+      "sha256": "218baed80de52c561a0647a5a52fa9c76f42939ce1c040eebd710b04434fb403"
+    }
+  ],
+  "entrypoints": [
+    {
+      "base": "package",
+      "path": "notes/README.md"
+    }
+  ],
+  "id": "R-001-MANIFEST",
+  "metadata_schema": "1",
+  "mode": "managed",
+  "owner": "Unassigned",
+  "payload_sha256": "",
+  "research_id": "R-001",
+  "roots": [
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "notes"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "rounds",
+      "role": "round"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "snapshots",
+      "role": "snapshot"
+    }
+  ],
+  "schema_version": "1.1",
+  "status": "active",
+  "title": "OpenTelemetry Java Agent upstream architecture — Research manifest",
+  "updated": "2026-10-23"
+}
