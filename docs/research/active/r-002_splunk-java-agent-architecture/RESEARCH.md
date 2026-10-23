@@ -48,7 +48,7 @@ approval_ref: ""
 - 固定 Splunk `v2.32.0` 标签，确认其 SDK `1.66.0`、Instrumentation `2.32.0`、Gradle `9.8.1` 和 Shadow `9.6.1`。
 - 已核对 `:agent`、`:bootstrap`、`:custom`、`:instrumentation:*`、`:opamp`、`:profiler`、`:dependencyManagement` 的实际代码和依赖。
 - 已确认 Splunk 沿用上游 Distro 的 Shadow 三阶段打包，`SplunkAgent` 仅薄委托给上游 Agent。
-- 详见 [Synthesis](SYNTHESIS.md) 和 [研究资料](notes/README.md)。
+- 详见 [Synthesis](SYNTHESIS.md)、[build.gradle.kts 深入解读](notes/build-gradle-deep-dive.md) 和 [研究资料](notes/README.md)。
 - 按项目要求，不创建独立原型，也不在 Research 阶段运行构建、Smoke Test 或性能测试。
 
 ## Research Rounds
@@ -68,7 +68,7 @@ approval_ref: ""
 | ID | Status | Question | Answer or disposition | Evidence |
 |---|---|---|---|---|
 | RQ-001 | answered | Splunk 发行版由哪些 Gradle 模块构成，各自承担什么职责？ | Agent/Bootstrap/Custom/Instrumentation/OpAMP/Profiler/依赖平台/测试与发布分层 | [Gradle 与打包](notes/gradle-and-packaging.md) |
-| RQ-002 | answered | Splunk 如何复用上游 Agent 并完成最终 JAR 打包？ | upstreamAgent + bootstrapLibs + javaagentLibs，Shadow 三阶段重定位、隔离、组装 | [Gradle 与打包](notes/gradle-and-packaging.md) |
+| RQ-002 | answered | Splunk 如何复用上游 Agent 并完成最终 JAR 打包？ | upstreamAgent + bootstrapLibs + javaagentLibs，Shadow 三阶段重定位、隔离、组装 | [Gradle 与打包](notes/gradle-and-packaging.md)、[构建脚本深入解读](notes/build-gradle-deep-dive.md) |
 | RQ-003 | answered | Splunk 是否重写了 Agent 启动与 SDK？ | SplunkAgent 只委托 OpenTelemetryAgent；定制通过官方 SPI 和少量内部 Tooling SPI | [运行时定制](notes/runtime-customizations.md) |
 | RQ-004 | answered | 产品默认配置、Resource、Profiler、OpAMP、Instrumentation 如何接入？ | custom 中的 AutoConfiguration SPI；Profiler/OpAMP 的 AgentListener；独立 InstrumentationModule | [运行时定制](notes/runtime-customizations.md) |
 | RQ-005 | answered | Splunk 如何管理依赖、测试、版本和发布？ | java-platform/BOM、Gradle conventions、Muzzle/Smoke Matrix、Maven/GPG/发布脚本 | [CI 与发布](notes/ci-release.md) |
@@ -116,6 +116,7 @@ Splunk 既大量复用上游 SPI，也使用 `BeforeAgentListener`、`javaagent-
 - [x] (2026-10-23) 固定 Splunk v2.32.0，读取 Gradle 与启动入口。
 - [x] (2026-10-23) 研究 SDK 定制、Instrumentation、Profiler、OpAMP 和发布流程。
 - [x] (2026-10-23) 完成与官方 Distro 的架构对照及 Datafox 取舍建议。
+- [x] (2026-10-23) 补充根构建、Agent 打包、Shadow 约定与版本平台的逐层解读。
 - [ ] Datafox 功能边界明确后再决定模块与交付渠道。
 
 ## Outcome
@@ -126,6 +127,7 @@ Splunk 既大量复用上游 SPI，也使用 `BeforeAgentListener`、`javaagent-
 
 - [当前研究结论](SYNTHESIS.md)
 - [Gradle 与打包](notes/gradle-and-packaging.md)
+- [build.gradle.kts 深入解读](notes/build-gradle-deep-dive.md)
 - [运行时定制](notes/runtime-customizations.md)
 - [CI 与发布](notes/ci-release.md)
 - [资料索引](notes/README.md)
@@ -135,3 +137,4 @@ Splunk 既大量复用上游 SPI，也使用 `BeforeAgentListener`、`javaagent-
 ## Revision Notes
 
 - 2026-10-23 — 创建 R-002，完成 Splunk v2.32.0 发行版架构的固定源码研究；不开展独立验证。
+- 2026-10-23 — 增补 build.gradle.kts、Configuration、Shadow 三阶段和 Manifest 的源码解读。
