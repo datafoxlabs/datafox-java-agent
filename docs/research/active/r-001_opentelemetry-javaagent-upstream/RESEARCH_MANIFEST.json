@@ -5,10 +5,17 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 749,
+      "bytes": 846,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "570213e47bd6028aa9f96ed648f1972610a668a5370e9c9ca698eb12864d384c"
+      "sha256": "aed29283c39a7d99a6005210a0c6bda433bb469babc60cc91bbc38a63ceb9d06"
+    },
+    {
+      "base": "package",
+      "bytes": 8980,
+      "path": "notes/distro-build-and-test.md",
+      "role": "document",
+      "sha256": "eca1c6865ab52a18a407fec8c7a88fa7fed907c80dca2b4bc0cf9933601d31f8"
     },
     {
       "base": "package",

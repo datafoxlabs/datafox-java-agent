@@ -13,6 +13,7 @@ flowchart LR
 ## 资料目录
 
 <!-- RCTL:NOTES:START -->
+- [OpenTelemetry Java Agent Distro：Gradle、打包与测试机制](./distro-build-and-test.md)
 - [OpenTelemetry Java Agent 上游架构证据（v2.32.0）](./upstream-analysis.md)
 <!-- RCTL:NOTES:END -->
 
