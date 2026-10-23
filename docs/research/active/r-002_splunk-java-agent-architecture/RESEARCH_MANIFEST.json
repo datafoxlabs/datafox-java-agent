@@ -5,17 +5,38 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 906,
+      "bytes": 873,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "82639876e221ea467a63a39535995800c8bc6ce6a27fb24d8ac45faf5467a6b0"
+      "sha256": "a0b9611c4abb6607548e655eb61a85cb7657534d89ac2865988413e4d3df9bcb"
     },
     {
       "base": "package",
-      "bytes": 1136,
+      "bytes": 3620,
+      "path": "notes/ci-release.md",
+      "role": "document",
+      "sha256": "1befee93b13d5e8ce88b03a3140ef291167b5066bdb94308ff57f51927a8e905"
+    },
+    {
+      "base": "package",
+      "bytes": 8367,
+      "path": "notes/gradle-and-packaging.md",
+      "role": "document",
+      "sha256": "b89fa39854f40f66af2714cac94bc6a4c7cbd8109bc323202c446713c4273bf1"
+    },
+    {
+      "base": "package",
+      "bytes": 7729,
+      "path": "notes/runtime-customizations.md",
+      "role": "document",
+      "sha256": "e5a44c6447208caf8e00ff3b442c7e2d5563618608515db5e104d965fa216891"
+    },
+    {
+      "base": "package",
+      "bytes": 1901,
       "path": "rounds/rr-001_baseline.md",
       "role": "round",
-      "sha256": "34e6459f631f4ceec1558eaf00e027b2e0acde3c26000777040d7c924a338d04"
+      "sha256": "be66ea9b18118576a516905d706935a334e715e4478b26a1f69da78cc10418ab"
     }
   ],
   "entrypoints": [

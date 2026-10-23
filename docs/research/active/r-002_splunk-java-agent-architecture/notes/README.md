@@ -15,9 +15,9 @@ flowchart LR
 ## 资料目录
 
 <!-- RCTL:NOTES:START -->
-- [Splunk Gradle 工程、模块与 Agent 打包](./gradle-and-packaging.md)
-- [Splunk 运行时定制、配置与产品能力](./runtime-customizations.md)
-- [Splunk CI、兼容性与发布工程](./ci-release.md)
+- [Splunk Java Agent 工程流程、测试与发布](./ci-release.md)
+- [Splunk Java Agent 发行版架构与 Gradle 构建](./gradle-and-packaging.md)
+- [Splunk 发行版专有能力与运行时接入机制](./runtime-customizations.md)
 <!-- RCTL:NOTES:END -->
 
 目录标记由 RepoFoundryAI 的 `researchctl` 自动维护。文件名和技术 API 保持原样，文档正文使用中文。

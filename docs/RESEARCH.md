@@ -22,7 +22,7 @@ approval plus a sealed `SYNTHESIS.md`.
 | ID | Title | Type | Status | Maturity | Owner | Updated | Synthesis | Path |
 |---|---|---|---|---|---|---|---|---|
 | R-001 | OpenTelemetry Java Agent 官方上游架构研究 | Architecture | active | evidence_building | Unassigned | 2026-10-23 | [Synthesis](research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md) | [Research](research/active/r-001_opentelemetry-javaagent-upstream/RESEARCH.md) |
-| R-002 | Splunk OpenTelemetry Java Agent 发行版架构研究 | Comparative | active | exploratory | Unassigned | 2026-10-23 | [Synthesis](research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md) | [Research](research/active/r-002_splunk-java-agent-architecture/RESEARCH.md) |
+| R-002 | Splunk OpenTelemetry Java Agent 发行版架构研究 | Comparative | active | evidence_building | Unassigned | 2026-10-23 | [Synthesis](research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md) | [Research](research/active/r-002_splunk-java-agent-architecture/RESEARCH.md) |
 <!-- RCTL:ACTIVE:END -->
 
 ## Completed
