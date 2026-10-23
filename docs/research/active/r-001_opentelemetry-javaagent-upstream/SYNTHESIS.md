@@ -18,7 +18,7 @@ payload_sha256:
 
 ## Executive Conclusion
 
-针对 OpenTelemetry Java Agent `v2.32.0`，官方提供“独立/内嵌 Extension”和“完整 Distro 重打包”两种不同范围的工程路线。项目已明确排除独立或内嵌 Extension 作为发行版打包路线。本轮已从固定版本源码确认官方完整 Distro 的三类依赖 Configuration、Shadow 三阶段打包、Bootstrap 可见性、Instrumentation/Muzzle 和 Smoke Test 机制。下一步验证最终 Agent JAR 的真实运行行为。当前尚不能确定 Datafox 所需的最小模块集合。
+针对 OpenTelemetry Java Agent `v2.32.0`，官方提供“独立/内嵌 Extension”和“完整 Distro 重打包”两种不同范围的工程路线。项目已明确排除独立或内嵌 Extension 作为发行版打包路线。本轮已从固定版本源码确认官方完整 Distro 的三类依赖 Configuration、Shadow 三阶段打包、Bootstrap 可见性、Instrumentation/Muzzle 和 Smoke Test 机制。项目已明确跳过 Research 阶段的独立运行原型，直接以源码结论作为后续工程设计输入。当前尚不能确定 Datafox 所需的最小模块集合。
 
 **成熟度：草稿／证据建设中。** 尚未在 Datafox 仓库实际构建、启动或验证 `-javaagent`。是否需要新增 Bootstrap 类、Agent 内置库、Instrumentation Helper 或声明式配置适配，仍须由 Datafox 的实际功能决定。
 
@@ -41,7 +41,7 @@ payload_sha256:
 
 ## Remaining Unknowns
 
-- RQ-005：尚未运行官方 Distro 重打包后的 Agent 启动、SPI 加载、OTLP 导出或 ClassLoader 边界测试。
+- RQ-005（deferred）：按项目要求不开展独立 Distro 原型；Agent 启动、SPI 加载、OTLP 导出及 ClassLoader 边界仍未实测，移至后续正式实施阶段。
 - RQ-006：Datafox 的功能、受支持 JVM/框架、标准配置覆盖范围、默认协议和发布要求尚未正式确定。
 - 尚未与 Splunk 或 Microsoft 的实际仓库结构进行对照；本 Research 有意只研究上游。
 
@@ -57,13 +57,14 @@ payload_sha256:
 
 后续仅研究 C（官方 Distro 构建路径）的最小充分实现；A 作为上游对照，B 已被项目要求排除。构建需区分 `bootstrapLibs`、`javaagentLibs`、`upstreamAgent`，保留上游 `premain` 入口，并对新增 Agent 库执行官方要求的 relocation、`inst/*.classdata` 隔离和 SPI 合并。按实际功能决定模块，保留官方 SPI 的使用，不照搬示例 Servlet 响应头修改。
 
-下一阶段用固定 `v2.32.0`/SDK 1.66.0 的 Distro GitHub Actions 原型验证（详见 [Distro 构建与测试证据](notes/distro-build-and-test.md)）：Gradle 构建可复现、`Premain-Class` 保留、SPI 自动发现、HTTP 请求产生 Span、OTLP 接收结果、显式 `otel.*` 配置不被默认配置覆盖。不得在缺少运行证据时宣布正式架构验收。
+本阶段不建立独立验证原型。后续正式实现时再执行必要的 Gradle 构建与运行验收，包括 `Premain-Class`、ClassLoader、SPI 和 OTLP 行为；当前结论仅依据上游固定版本源码，不声称 Datafox 已通过这些检查。
 
 ## Handoff to ADR and ExecPlan
 
-该 Research 暂不交给 ADR 或工程实现。研发时以 [上游源码证据](notes/upstream-analysis.md) 为入口，后续必须补齐 Datafox 功能需求和实际 smoke-test 证据。Research Owner 未分配，不能封存 Synthesis 或认为架构已批准。
+该 Research 可以作为后续 Gradle 工程设计的源码依据，但不等于已批准 ADR。研发时以 [上游源码证据](notes/upstream-analysis.md) 和 [Distro 构建分析](notes/distro-build-and-test.md) 为入口；正式实施时再完成必要的构建与运行验收。Research Owner 未分配，不能封存 Synthesis 或认为架构已批准。
 
 ## Revision Notes
 
 - 2026-10-23 — 首轮官方源码调查形成 draft，保留运行验证与功能范围两个未决问题。
 - 2026-10-23 — 深入核对 Gradle 约定、Shadow 三阶段打包、Muzzle 和 Smoke Test；不改变 Research 的未批准状态。
+- 2026-10-23 — 根据用户要求取消独立原型验证，将 RQ-005 延后到正式实现阶段。
