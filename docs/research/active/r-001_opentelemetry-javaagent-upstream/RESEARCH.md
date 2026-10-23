@@ -55,7 +55,7 @@ approval_ref: ""
 
 | Round | Focus | Status | 编写者 | Started | Evidence and outcome |
 |---|---|---|---|---|---|
-| RR-001 | 上游源码与两种打包方式 | 进行中 | ChatGPT (GitHub MCP) | 2026-10-23 | [Baseline](rounds/rr-001_baseline.md), [Evidence](notes/upstream-analysis.md) |
+| RR-001 | 上游源码与两种打包方式 | active | ChatGPT (GitHub MCP) | 2026-10-23 | [Baseline](rounds/rr-001_baseline.md), [Evidence](notes/upstream-analysis.md) |
 
 ## Scope and Non-goals
 
@@ -65,14 +65,14 @@ approval_ref: ""
 
 ## Research Questions
 
-| 编号 | 状态 | 问题 | 结论或处理意见 | 证据 |
+| ID | Status | Question | Answer or disposition | Evidence |
 |---|---|---|---|---|
-| RQ-001 | 已回答 | Agent 的 ClassLoader 与封装边界是什么？ | System/Bootstrap/Agent/Extension 分层；`inst/*.classdata` 与独立 Extension 加载器 | [Evidence](notes/upstream-analysis.md) |
-| RQ-002 | 已回答 | 标准 Extension 与完整 Distro 打包的范围差异？ | 标准 Extension 可独立或嵌入；完整 Distro 增加 relocations 与 Agent/Bootstrap 打包 | [Evidence](notes/upstream-analysis.md) |
-| RQ-003 | 已回答 | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；Alpha SPI 无兼容承诺 | [Evidence](notes/upstream-analysis.md) |
-| RQ-004 | 已回答 | 标准配置优先级及声明式配置的差异？ | 属性 supplier 优先级最低；`AutoConfigurationCustomizerProvider` 不适用于声明式 YAML | [Evidence](notes/upstream-analysis.md) |
-| RQ-005 | 待研究 | 一个最小嵌入式 Extension 是否通过实际 Agent 启动与遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions 原型 |
-| RQ-006 | 待研究 | Datafox 已确定功能是否需要 Bootstrap/Agent 类或声明式配置？ | 项目尚无足够功能需求及验收契约 | 需进入功能设计前确认 |
+| RQ-001 | answered | Agent 的 ClassLoader 与封装边界是什么？ | System/Bootstrap/Agent/Extension 分层；`inst/*.classdata` 与独立 Extension 加载器 | [Evidence](notes/upstream-analysis.md) |
+| RQ-002 | answered | 标准 Extension 与完整 Distro 打包的范围差异？ | 标准 Extension 可独立或嵌入；完整 Distro 增加 relocations 与 Agent/Bootstrap 打包 | [Evidence](notes/upstream-analysis.md) |
+| RQ-003 | answered | 2.32.0 的 Gradle / SDK / SPI 版本与构建约定？ | SDK 1.66.0、Gradle 9.8.0、Java `release=8`；Alpha SPI 无兼容承诺 | [Evidence](notes/upstream-analysis.md) |
+| RQ-004 | answered | 标准配置优先级及声明式配置的差异？ | 属性 supplier 优先级最低；`AutoConfigurationCustomizerProvider` 不适用于声明式 YAML | [Evidence](notes/upstream-analysis.md) |
+| RQ-005 | open | 一个最小嵌入式 Extension 是否通过实际 Agent 启动与遥测验证？ | 尚未构建及运行原型 | 下一轮 GitHub Actions 原型 |
+| RQ-006 | open | Datafox 已确定功能是否需要 Bootstrap/Agent 类或声明式配置？ | 项目尚无足够功能需求及验收契约 | 需进入功能设计前确认 |
 
 状态枚举：`open`（待研究）、`answered`（已回答）、`deferred`（延后）、`invalidated`（问题前提失效）。
 
