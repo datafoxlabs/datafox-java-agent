@@ -2,7 +2,7 @@
 
 > **建议从本文开始读 R-002。** 这是一篇按实际阅读顺序编写的源码解读，不是结论清单。  
 > 源码基线：[Splunk Java Agent `v2.32.0`](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)；上游 OpenTelemetry Java Instrumentation `v2.32.0`。  
-> 想查每项 Gradle 配置、重定位规则、资源合并和发布实现，再读 [`build.gradle.kts` 逐项精读](build-gradle-deep-dive.md)。  
+> 接着读 [Shadow 约定插件逐条源码分析](shadow-conventions-source-walkthrough.md)，了解 relocation 与 SPI 合并。要查询更完整的 Gradle 规则和发布机制，再看 [`build.gradle.kts` 逐项精读](build-gradle-deep-dive.md)。  
 > 本阶段仅研究源码，未在 Datafox 构建或运行 Agent。
 
 ## 先说答案：Splunk 是怎么做发行版的？
@@ -335,7 +335,7 @@ META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustom
 
 这也是为什么 `duplicatesStrategy = EXCLUDE` 不能替代 SPI 合并。
 
-想核对所有 relocation、签名过滤和排除项，可接着阅读 [源码精读的 Shadow 章节](build-gradle-deep-dive.md#6-shadow为什么必须分成三个任务)。
+想核对每条 relocation 的作用、SPI 合并、签名过滤和依赖排除，接着阅读 [Shadow 约定插件逐条源码分析](shadow-conventions-source-walkthrough.md)。
 
 ## 第六站：打包完后，JVM 到底启动哪个类？
 
@@ -421,8 +421,9 @@ Splunk 额外处理许可证报告，并在发布脚本中生成 SHA-256、GitHu
 
 若要着手编写 Datafox Gradle，可按下面的顺序使用现有证据：
 
-1. [深入版：`build.gradle.kts` 逐项源码精读](build-gradle-deep-dive.md)——核对每条 Shadow 配置、依赖继承和发布细节。
-2. [运行时定制机制](runtime-customizations.md)——理解 `:custom`、OpAMP、Profiler、Instrumentation 各自何时接入。
-3. [Datafox Gradle 工程设计草案](../../../../design-docs/datafox-gradle-distribution.md)——将确定的打包契约转为最小工程模块，不提前复制 Splunk 的全部功能。
+1. [Shadow 约定插件逐条源码分析](shadow-conventions-source-walkthrough.md)——核对所有 relocation、ServiceLoader 规则、资源过滤及依赖排除的作用。
+2. [深入版：`build.gradle.kts` 逐项源码精读](build-gradle-deep-dive.md)——理解整个 Gradle 构建体系和发行物组织。
+3. [运行时定制机制](runtime-customizations.md)——理解 `:custom`、OpAMP、Profiler、Instrumentation 各自何时接入。
+4. [Datafox Gradle 工程设计草案](../../../../design-docs/datafox-gradle-distribution.md)——将确定的打包契约转为最小工程模块，不提前复制 Splunk 的全部功能。
 
 **证据边界**：此文的代码示例来自固定版本源码，少量代码为删去无关项的节选；上面写的 Datafox“采用／不采用”属于当前设计方向，不是已执行的构建结果。按照项目要求，本阶段不进行独立 Agent 原型验证。
