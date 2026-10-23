@@ -1,0 +1,62 @@
+{
+  "artifact_type": "research-manifest",
+  "author": "ChatGPT (GitHub MCP)",
+  "created": "2026-10-23",
+  "documents": [
+    {
+      "base": "package",
+      "bytes": 906,
+      "path": "notes/README.md",
+      "role": "entrypoint",
+      "sha256": "82639876e221ea467a63a39535995800c8bc6ce6a27fb24d8ac45faf5467a6b0"
+    },
+    {
+      "base": "package",
+      "bytes": 1136,
+      "path": "rounds/rr-001_baseline.md",
+      "role": "round",
+      "sha256": "34e6459f631f4ceec1558eaf00e027b2e0acde3c26000777040d7c924a338d04"
+    }
+  ],
+  "entrypoints": [
+    {
+      "base": "package",
+      "path": "notes/README.md"
+    }
+  ],
+  "id": "R-002-MANIFEST",
+  "metadata_schema": "1",
+  "mode": "managed",
+  "owner": "Unassigned",
+  "payload_sha256": "",
+  "research_id": "R-002",
+  "roots": [
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "notes"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "rounds",
+      "role": "round"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "snapshots",
+      "role": "snapshot"
+    }
+  ],
+  "schema_version": "1.1",
+  "status": "active",
+  "title": "Splunk OpenTelemetry Java Agent 发行版架构研究 — Research manifest",
+  "updated": "2026-10-23"
+}
