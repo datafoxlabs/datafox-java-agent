@@ -1,6 +1,10 @@
 {
   "high_water": {
-    "R": 1
+    "ADR": 0,
+    "BF": 0,
+    "EP": 0,
+    "R": 1,
+    "TD": 0
   },
   "version": 1
 }
