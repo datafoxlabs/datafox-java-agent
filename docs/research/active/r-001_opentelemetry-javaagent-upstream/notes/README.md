@@ -15,7 +15,7 @@ flowchart LR
 ## Note inventory
 
 <!-- RCTL:NOTES:START -->
-- No note documents yet.
+- [OpenTelemetry Java Agent upstream evidence (v2.32.0)](./upstream-analysis.md)
 <!-- RCTL:NOTES:END -->
 
 The inventory between the `RCTL:NOTES` markers is maintained by `researchctl.py`.

@@ -5,17 +5,24 @@
   "documents": [
     {
       "base": "package",
-      "bytes": 906,
+      "bytes": 962,
       "path": "notes/README.md",
       "role": "entrypoint",
-      "sha256": "5ed7595de519e75ef0bc7910ed64cda0a815e49da1a57684b09c95ddce7a2eb0"
+      "sha256": "1acfcf7b334c2671535f017c217f004ae004433e515c38d8b347c4a0568f7a17"
     },
     {
       "base": "package",
-      "bytes": 1122,
+      "bytes": 8632,
+      "path": "notes/upstream-analysis.md",
+      "role": "document",
+      "sha256": "9177cd34aef5336d44264e4fe513b7f70fa1f1857efdaf84b71aee6553558774"
+    },
+    {
+      "base": "package",
+      "bytes": 1992,
       "path": "rounds/rr-001_baseline.md",
       "role": "round",
-      "sha256": "218baed80de52c561a0647a5a52fa9c76f42939ce1c040eebd710b04434fb403"
+      "sha256": "43fb56749e2c198e9eb78f7535008236938c5e4cc27c8f80118240b2806d3662"
     }
   ],
   "entrypoints": [
