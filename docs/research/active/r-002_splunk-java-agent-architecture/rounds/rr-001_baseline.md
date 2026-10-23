@@ -26,6 +26,7 @@ owner: "Unassigned"
 
 - [Gradle 模块、打包与启动入口](../notes/gradle-and-packaging.md)
 - [build.gradle.kts 深入解读](../notes/build-gradle-deep-dive.md)
+- [Shadow 约定插件逐条源码分析](../notes/shadow-conventions-source-walkthrough.md)
 - [SDK 配置、Profiler、OpAMP、Instrumentation](../notes/runtime-customizations.md)
 - [CI、兼容性与发布流程](../notes/ci-release.md)
 - [Splunk v2.32.0 源码](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)
@@ -33,7 +34,7 @@ owner: "Unassigned"
 
 ## Synthesis Delta
 
-相对 R-001 官方 Distro 研究，新增证据表明 Splunk 的主发行版沿用上游三阶段 Shadow 打包，但加入产品模块、薄启动委托、统一依赖管理、Muzzle/Smoke Test 和发布管线。推荐借鉴其工程边界，而非照搬全部功能和内部依赖。
+相对 R-001 官方 Distro 研究，新增证据表明 Splunk 的主发行版沿用上游三阶段 Shadow 打包，但加入产品模块、薄启动委托、统一依赖管理、Muzzle/Smoke Test 和发布管线。本轮还进一步解释了 `splunk.shadow-conventions` 对所有 ShadowJar 的公共配置、两处 ServiceLoader 合并、relocation 例外及依赖排除的不同作用。推荐借鉴其工程边界，而非照搬全部功能和内部依赖。
 
 ## Next Inquiry
 
