@@ -20,13 +20,13 @@ payload_sha256:
 
 **Splunk 的主体实现是“上游 OpenTelemetry Java Agent + 官方 Distro 风格的三阶段重打包 + 产品特有模块”。** 它不 Fork SDK，也不依赖把主发行版功能作为外部 Extension JAR 加载。Splunk 在官方 Distro 基础上增加了薄启动入口、集中依赖管理、产品默认配置、专有 Instrumentation、OpAMP、Profiler 和成熟的测试发布工程。
 
-对 Datafox 最值得借鉴的是 **Gradle 的类加载依赖边界、Shadow 组装、统一版本和按业务能力分模块**。**建议先读 [从 Gradle 工程到最终 Agent JAR](notes/gradle-and-packaging.md)**，沿着一个发行包的构建过程理解各阶段。需要核对完整 Gradle 配置、插件约定、依赖平台和 ServiceLoader 的实现细节，再读 [build.gradle.kts 源码精读](notes/build-gradle-deep-dive.md)。Synthesis 用于保存结论，不代替这些源码说明。不建议直接复制 Splunk 的所有模块、内部 Tooling SPI、远程管理、Profiling 或商业发布渠道。该结论来自 Splunk `v2.32.0` 与 OpenTelemetry `v2.32.0` 的源码；**尚未构建或运行 Datafox Agent**。
+对 Datafox 最值得借鉴的是 **Gradle 的类加载依赖边界、Shadow 组装、统一版本和按业务能力分模块**。**建议先读 [从 Gradle 工程到最终 Agent JAR](notes/gradle-and-packaging.md)**，沿着一个发行包的构建过程理解各阶段。需要核对完整 Gradle 配置、插件约定、依赖平台和 ServiceLoader 的实现细节，先读 [Shadow 约定插件逐条精读](notes/shadow-conventions-source-walkthrough.md)，再看 [build.gradle.kts 全工程源码精读](notes/build-gradle-deep-dive.md)。Synthesis 用于保存结论，不代替这些源码说明。不建议直接复制 Splunk 的所有模块、内部 Tooling SPI、远程管理、Profiling 或商业发布渠道。该结论来自 Splunk `v2.32.0` 与 OpenTelemetry `v2.32.0` 的源码；**尚未构建或运行 Datafox Agent**。
 
 ## Supported Findings
 
 | 发现 | 证据强度 | 来源 |
 |---|---|---|
-| Splunk 使用发布的上游 Agent 和三种 Configuration，Shadow 分为 relocation、`inst/*.classdata` 隔离、最终组装 | 高：固定 Gradle 源码 | [Gradle 与打包](notes/gradle-and-packaging.md)、[构建脚本深入解读](notes/build-gradle-deep-dive.md) |
+| Splunk 使用发布的上游 Agent 和三种 Configuration，Shadow 分为 relocation、`inst/*.classdata` 隔离、最终组装 | 高：固定 Gradle 源码 | [Gradle 与打包](notes/gradle-and-packaging.md)、[Shadow 规则逐条精读](notes/shadow-conventions-source-walkthrough.md)、[构建脚本深入解读](notes/build-gradle-deep-dive.md) |
 | `SplunkAgent.premain` 最终委托 `OpenTelemetryAgent.agentmain`，没有重新实现 SDK 初始化 | 高：Java 入口源码 | [Gradle 与打包](notes/gradle-and-packaging.md) |
 | `:custom` 使用 SDK SPI 处理默认配置、Realm/Token、SpanLimits 和发行版资源属性 | 高：Java 源码 | [运行时定制](notes/runtime-customizations.md) |
 | OpAMP 与 Profiler 独立模块，借助 AgentListener 生命周期按需启动 | 高：Java 源码 | [运行时定制](notes/runtime-customizations.md) |
@@ -76,3 +76,4 @@ Research Owner 尚未分配；本 Synthesis 保持草稿，不执行 `conclude-r
 - 2026-10-23 — 根据项目要求明确 Splunk First 的工程结构与 Gradle 打包优先级，关联设计草案；不改变 Research 未批准状态。
 - 2026-10-23 — 将 build.gradle.kts 简版摘要改写为完整源码精读，覆盖构建职责、依赖平台、Shadow 各阶段、Manifest、发布与 Datafox 取舍；不改变研究状态。
 - 2026-10-23 — 将 Gradle 构建分析改为可循序阅读的源码导读，并通过资料索引提供“先理解，再深入”的阅读路径。
+- 2026-10-23 — 增补 Shadow 约定插件专题，结合真实 `:agent` 三阶段 Task 解释每条重定位、ServiceLoader 合并与依赖排除规则。
