@@ -1,6 +1,7 @@
 dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver")
   testImplementation("io.opentelemetry:opentelemetry-api")
+  testImplementation("io.opentelemetry.proto:opentelemetry-proto")
 }
 
 tasks.named<JavaCompile>("compileTestJava") {
