@@ -123,7 +123,7 @@ tasks.named<ShadowJar>("shadowJar") {
         "Can-Redefine-Classes" to true,
         "Can-Retransform-Classes" to true,
         "Implementation-Vendor" to "Datafox",
-        "Implementation-Version" to "datafox-\${project.version}-otel-2.32.0",
+        "Implementation-Version" to "datafox-${project.version}-otel-2.32.0",
       )
     )
   }
