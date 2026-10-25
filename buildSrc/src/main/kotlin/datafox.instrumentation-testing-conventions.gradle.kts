@@ -56,6 +56,8 @@ val latestDepTestLibrary = configurations.create("latestDepTestLibrary") {
   isCanBeConsumed = false
 }
 
+val testImplementationConfiguration = configurations.getByName("testImplementation")
+
 listOf(library, testLibrary).forEach { configuration ->
   configuration.dependencies.whenObjectAdded {
     val dependency = copy()
@@ -64,14 +66,14 @@ listOf(library, testLibrary).forEach { configuration ->
         require("latest.release")
       }
     }
-    dependencies.add("testImplementation", dependency)
+    testImplementationConfiguration.dependencies.add(dependency)
   }
 }
 
 if (testLatestDeps) {
   latestDepTestLibrary.dependencies.whenObjectAdded {
     val dependency = copy()
-    dependencies.add("testImplementation", dependency)
+    testImplementationConfiguration.dependencies.add(dependency)
   }
 }
 
