@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      publish_maven:
+        description: "Explicitly publish the signed tag to Maven Central"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -32,6 +38,26 @@ jobs:
           [[ "$VERSION" != *-SNAPSHOT ]]
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]
 
+      - name: Validate signing and publishing prerequisites
+        if: github.ref_type == 'tag'
+        env:
+          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+          SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}
+          PUBLISH_MAVEN: ${{ inputs.publish_maven || false }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$GPG_SECRET_KEY"
+          test -n "$GPG_PASSWORD"
+          test -n "$GPG_KEY_ID"
+          if [[ "$PUBLISH_MAVEN" == "true" ]]; then
+            test -n "$SONATYPE_USER"
+            test -n "$SONATYPE_KEY"
+          fi
+
       - name: Generate license inventory
         run: ./gradlew :agent:generateLicenseReport --no-daemon
 
@@ -41,11 +67,28 @@ jobs:
       - name: Prepare checksummed distribution
         run: bash scripts/prepare-release.sh
 
+      - name: Sign GitHub Release artifacts and checksums
+        if: github.ref_type == 'tag'
+        env:
+          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        run: bash scripts/sign-release.sh
+
       - uses: actions/upload-artifact@v4
         with:
           name: datafox-release-bundle
           path: dist/
           if-no-files-found: error
+
+      - name: Publish to Maven Central
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_maven == true && github.ref_type == 'tag'
+        env:
+          GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+          SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-daemon --stacktrace
 
       - name: Create draft GitHub Release
         if: github.ref_type == 'tag'
