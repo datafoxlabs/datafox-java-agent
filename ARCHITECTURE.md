@@ -1,6 +1,6 @@
 # Datafox Java Agent 架构
 
-状态：按 Splunk v2.32.0 对齐工程基础设施；新一轮 build / test / smoke-test CI 正在执行
+状态：Splunk 风格基础设施首轮 CI 通过；尚未实现 Datafox 专有 Instrumentation
 更新日期：2026-10-25
 
 ## System Purpose
@@ -9,7 +9,7 @@ Datafox Java Agent 是基于 OpenTelemetry Java Instrumentation 的定制发行�
 
 ## Code Map
 
-**当前仓库事实：** 已建立 Gradle 9.8.1 Wrapper、`:agent`、`:bootstrap`、`:custom`、`:dependencyManagement`、`:instrumentation`、`:smoke-tests`、`:testing:common` 和 `:testing:agent-for-testing`；`buildSrc` 提供 Java、Spotless、Shadow 与可选 Muzzle 约定。Agent 包含 Splunk 风格的三阶段 Shadow 打包、无 classifier Maven 主制品、Sources/Javadoc 和可选 GPG 签名。当前 CI 正在验证这些新增模块。
+**当前仓库事实：** 已建立 Gradle 9.8.1 Wrapper、`:agent`、`:bootstrap`、`:custom`、`:dependencyManagement`、`:instrumentation`、`:smoke-tests`、`:testing:common` 和 `:testing:agent-for-testing`；`buildSrc` 提供 Java、Spotless、Shadow 与可选 Muzzle 约定。Agent 包含 Splunk 风格的三阶段 Shadow 打包、无 classifier Maven 主制品、Sources/Javadoc 和可选 GPG 签名。最新 CI 已通过 Gradle build/unit test、测试 Agent 打包、JAR 内容检查、许可证报告和应用级 Smoke Test。
 
 **对齐策略：** 工程基础设施、Gradle 约定、Shadow 任务、测试与评测流水线优先 1:1 对齐 [Splunk Java Agent v2.32.0](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)。Splunk 的 Realm/Token、OpAMP、Profiler、No-code 与专有应用服务器 Instrumentation 等产品功能不复制。
 
