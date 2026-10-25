@@ -1,15 +1,14 @@
 plugins {
-  `java-library`
+  id("java-test-fixtures")
 }
 
 dependencies {
-  compileOnly(platform(project(":dependencyManagement")))
+  compileOnly(project(":bootstrap"))
   compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-  options.release.set(8)
+  testFixturesApi(project(":testing:common"))
+  testImplementation("io.opentelemetry:opentelemetry-sdk")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
 }
 
 val versionProperties = layout.buildDirectory.file("generated/resources/datafox.properties")
