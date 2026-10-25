@@ -34,7 +34,7 @@
 | Manifest 与薄启动委托 | 已实现并通过 JAR 检查 | `DatafoxAgent` 委托给上游 `OpenTelemetryAgent` |
 | `mainShadowJar` 无 classifier 主制品 | 已实现 | 与 `-all` 发行 JAR 分离 |
 | Maven Publication / POM / Sources / Javadoc | 已实现 | 发布坐标已配置，未发布到远程仓库 |
-| GPG 签名 | 离线验签实现已提交，待 CI 确认 | 正式标签 Release 需要 Secret Key/口令/Key ID；CI 使用一次性临时密钥测试，签名不会作为正式发布资产上传 |
+| GPG 签名 | CI 临时密钥签名与验签已通过 | 真实标签仍需正式 GPG 密钥；CI 验证 Release `.asc`、`SHA256SUMS.asc` 和本地 Maven Publication 的签名，测试签名不作为正式制品上传 |
 | License report 与上游报告区分 | 已实现并通过 CI | Release 前生成许可证清单，将 Datafox 许可证归档嵌入并区分于上游资源 |
 
 ## 3. 测试与评测体系
@@ -44,7 +44,7 @@
 | JUnit Platform + 统一测试日志 | 已实现并通过 CI | 已在公共 Java 约定中配置 |
 | `:testing:common` | 已实现 | 共享 OTel 测试依赖 |
 | `:testing:agent-for-testing` | 已实现并通过 CI | 复用三阶段打包，依赖官方 `opentelemetry-agent-for-testing` |
-| Instrumentation 测试约定 | 已实现，待 CI 确认 | 新增非产品测试夹具，验证 `-javaagent` 实际注入测试 JVM，并使用独立 Instrumentation 测试 JAR |
+| Instrumentation 测试约定 | 已通过 Gradle CI | 非产品测试夹具通过 `-javaagent` 注入测试 JVM，验证配置了独立 Instrumentation 测试 JAR；尚无产品 Instrumentation |
 | `testLatestDeps` | 实现已完善，暂无目标模块 | 已加入预发布版本识别和固定例外约束；待专有 Instrumentation 接入后验证真实依赖切换 |
 | Muzzle generation/check 约定 | 已实现（按需应用） | 当前没有 Datafox Instrumentation 模块，因此没有 Muzzle 目标 |
 | `:instrumentation:listMuzzleInstrumentations` | 已实现 | CI 逐个执行已注册模块的 Muzzle 任务 |
@@ -63,8 +63,8 @@
 | Smoke Test 独立 Job | 已通过 CI | 与普通 `build` 分离 |
 | 发行 JAR 作为 CI Artifact | 已实现 | `datafox-javaagent` |
 | 第三方许可证报告 Artifact | 已通过 CI | `datafox-license-report` |
-| GitHub Release、校验和、签名文件 | SHA-256 已通过；GPG 测试待 CI | 版本标签强制签名并创建 Draft Release；重复触发只能更新草稿，绝不覆盖公开 Release；正式流程未触发 |
-| Maven Central / Sonatype 远程发布 | 离线发布校验待 CI；远程未执行 | 常规 CI 检验 `publishToMavenLocal`，带标签的手动工作流显式选中 `publish_maven=true` 并提供密钥后才上传 |
+| GitHub Release、校验和、签名文件 | SHA-256 与离线 GPG 签名检查已通过 | 版本标签强制签名并创建 Draft Release；重复触发仅更新草稿，不覆盖公开 Release；真实标签流程未触发 |
+| Maven Central / Sonatype 远程发布 | 本地 Maven Publication 已通过 CI；远程未执行 | CI 验证无 classifier 主 JAR、POM、Sources/Javadoc；正式标签的 `publish_maven=true` 需凭据后才能上传 |
 | Docker / Operator / Cloud Foundry 发行渠道 | 按产品范围决定 | 不是当前交付要求 |
 
 ## 5. 当前判断
@@ -72,9 +72,9 @@
 Datafox 已从单一 Shadow 构建脚本扩展为包含公共 Gradle 约定、Bootstrap 入口、测试 Agent、Smoke Test、Muzzle 约定、许可证报告与 Maven Publication 的工程骨架。[最新 CI（40166248476）](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40166248476) 中，Gradle build/unit test、测试 Agent 打包、JAR 检查、许可证报告、Release Bundle 校验及 Linux/Windows × 5 个应用 JDK 的全部 10 组 Smoke Test 均通过。
 
 **尚未完全 1:1 对齐。** 当前主要差距：
-1. 最新依赖测试机制尚未完整复制 Splunk；
+1. Latest Dependencies / Muzzle 已有工程入口，但尚没有 Datafox 产品 Instrumentation 作为实际兼容目标；
 2. Linux/Windows × Java 8/11/17/21/25 的 10 组运行测试已通过；目标应用服务器矩阵仍需结合产品兼容范围；
 3. Release Bundle 和许可证整合通过 CI，但实际带标签的 Draft Release 尚未触发；
-4. Maven Central 实际远程发布、真实密钥签名、构建扫描与专有 Instrumentation 的真实 Muzzle/latest-deps 检查仍待完成；本轮已建立离线签名验证和非产品的测试 Agent 注入检查。
+4. Maven Central 远程发布、生产密钥验签、构建扫描与产品 Instrumentation 的真实兼容性检查仍未执行；本地签名和测试 Agent 注入均已由 CI 校验。
 
 以上差距只涉及工程基础设施。OpAMP、Profiler、No-code、专有应用服务器 Instrumentation 等产品模块不在本次对齐范围。
