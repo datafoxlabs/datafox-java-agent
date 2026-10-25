@@ -24,6 +24,7 @@ val upstreamAgent = configurations.create("upstreamAgent") {
 
 dependencies {
   add(upstreamAgent.name, platform(project(":dependencyManagement")))
+  bootstrapLibs(project(":bootstrap"))
   javaagentLibs(project(":custom"))
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent")
 }
@@ -79,12 +80,12 @@ tasks.named<ShadowJar>("shadowJar") {
     attributes(
       mapOf(
         "Main-Class" to "io.opentelemetry.javaagent.OpenTelemetryAgent",
-        "Agent-Class" to "io.opentelemetry.javaagent.OpenTelemetryAgent",
-        "Premain-Class" to "io.opentelemetry.javaagent.OpenTelemetryAgent",
+        "Agent-Class" to "com.datafox.opentelemetry.javaagent.DatafoxAgent",
+        "Premain-Class" to "com.datafox.opentelemetry.javaagent.DatafoxAgent",
         "Can-Redefine-Classes" to "true",
         "Can-Retransform-Classes" to "true",
         "Implementation-Vendor" to "Datafox",
-        "Implementation-Version" to project.version.toString(),
+        "Implementation-Version" to "datafox-${project.version}-otel-2.32.0",
       )
     )
   }
