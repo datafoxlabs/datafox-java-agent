@@ -59,6 +59,15 @@ jobs:
         run: ./gradlew build --no-daemon
       - name: Build test Agent
         run: ./gradlew :testing:agent-for-testing:shadowJar --no-daemon
+      - name: Verify Maven publication locally
+        run: |
+          ./gradlew :agent:publishToMavenLocal --no-daemon
+          VERSION="$(sed -n 's/^val distroVersion = "\([^"]*\)"/\1/p' version.gradle.kts)"
+          REPO="$HOME/.m2/repository/com/datafox/datafox-javaagent/$VERSION"
+          test -s "$REPO/datafox-javaagent-$VERSION.jar"
+          test -s "$REPO/datafox-javaagent-$VERSION.pom"
+          test -s "$REPO/datafox-javaagent-$VERSION-sources.jar"
+          test -s "$REPO/datafox-javaagent-$VERSION-javadoc.jar"
       - name: Inspect packaged Agent
         run: |
           AGENT=agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar
@@ -141,6 +150,20 @@ jobs:
         run: ./gradlew :agent:assemble :agent:generatePomFileForMavenPublication --no-daemon
       - name: Verify checksummed release bundle
         run: bash scripts/prepare-release.sh
+      - name: Test GPG detached signatures with an ephemeral CI key
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GNUPGHOME="$(mktemp -d)"
+          chmod 700 "$GNUPGHOME"
+          trap 'rm -rf "$GNUPGHOME"' EXIT
+          export GPG_PASSWORD="datafox-ci-test-only"
+          gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSWORD" \
+            --quick-generate-key 'Datafox CI <ci@example.invalid>' rsa2048 sign 0
+          export GPG_KEY_ID="$(gpg --list-secret-keys --with-colons | awk -F: '$1=="sec"{print $5;exit}')"
+          test -n "$GPG_KEY_ID"
+          export GPG_SECRET_KEY="$(gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSWORD" --armor --export-secret-keys "$GPG_KEY_ID")"
+          bash scripts/sign-release.sh
       - uses: actions/upload-artifact@v4
         with:
           name: datafox-release-bundle
