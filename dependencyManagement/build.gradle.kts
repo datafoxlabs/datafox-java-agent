@@ -13,6 +13,7 @@ dependencies {
   constraints {
     api("io.opentelemetry.javaagent:opentelemetry-javaagent:2.32.0")
     api("io.opentelemetry.javaagent:opentelemetry-javaagent-bootstrap:2.32.0")
+    api("io.opentelemetry.javaagent:opentelemetry-javaagent-bootstrap:2.32.0")
     api("io.opentelemetry.javaagent:opentelemetry-agent-for-testing:2.32.0-alpha")
     api("org.junit.jupiter:junit-jupiter-api:5.12.2")
     api("org.junit.jupiter:junit-jupiter-engine:5.12.2")
