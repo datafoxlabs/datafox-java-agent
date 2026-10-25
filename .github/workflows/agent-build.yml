@@ -1,5 +1,9 @@
 name: Build Datafox Java Agent
 
+concurrency:
+  group: agent-build-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
