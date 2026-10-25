@@ -1,6 +1,6 @@
 # Datafox Java Agent：基于 Splunk 的 Gradle 发行版工程设计（草案）
 
-状态：最小工程骨架已实施，后续能力仍属设计草案；2026-10-25。**工程结构与 Gradle 打包优先参考 Splunk v2.32.0；运行时接口与类加载契约以 OpenTelemetry Java Instrumentation v2.32.0 为准。**
+状态：Splunk 工程基础设施 1:1 对齐实施中；2026-10-25。**工程结构与 Gradle 打包优先参考 Splunk v2.32.0；运行时接口与类加载契约以 OpenTelemetry Java Instrumentation v2.32.0 为准。**
 
 依据：
 - [R-002：Splunk 发行版架构研究](../research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md)
@@ -11,12 +11,12 @@
 
 ## 1. 设计优先级
 
-1. **工程组织和 Gradle 打包：Splunk First。** 参考 Splunk 的 `:agent`、`:bootstrap`、`:custom`、`:dependencyManagement`、`:instrumentation` 组织方式、Shadow 三阶段任务和版本管理。
+1. **工程组织和 Gradle 打包：Splunk 1:1。** 以 `signalfx/splunk-otel-java@v2.32.0` 的 Gradle 工程组织、`buildSrc` 约定、依赖管理、Agent/Bootstrap Configuration、Shadow 三阶段任务、发行物和发布任务作为对齐基线。
 2. **技术契约：OpenTelemetry Upstream First。** ClassLoader、`inst/*.classdata`、SPI、Instrumentation、Context 和 SDK 生命周期以官方当前兼容版本为准。
-3. **模块落地：Datafox 需求优先。** 仅创建当前功能与打包实际需要的模块；不提前引入 Splunk Profiler、OpAMP、No-code、商业应用服务器 Instrumentation 或其发布渠道。
+3. **基础设施与产品功能分离。** Gradle、Shadow、测试、评测、依赖管理和发布工程按 Splunk 的机制对齐；Splunk 的 Realm/Token、Profiler、OpAMP、No-code、专有应用服务器埋点等产品功能不复制。
 4. **明确排除：独立/嵌入式 Extension JAR 发行路线与 Fork 上游 Agent。** 允许发行版内部使用官方 SPI，但定制类直接作为 `javaagentLibs` 经隔离打入 Agent。
 
-## 2. 工程布局（当前实现与后续规划）
+## 2. 工程布局（Splunk 对齐目标）
 
 ```text
 datafox-java-agent/
@@ -34,15 +34,15 @@ datafox-java-agent/
 │   └── build.gradle.kts                 # 发行包与 Shadow 三阶段
 ├── custom/                              # 已实现发行版 ResourceProvider
 │   └── build.gradle.kts
-├── bootstrap/                           # 规划：仅有 Bootstrap 可见类时创建
+├── bootstrap/                           # 已创建：Splunk 风格入口委托
 │   └── build.gradle.kts
-├── instrumentation/                     # 规划：仅新增专有埋点时创建
+├── instrumentation/                     # 已创建：聚合与 Muzzle 发现任务
 │   └── <feature>/build.gradle.kts
-├── smoke-tests/                         # 规划：应用级 Smoke Test
-└── .github/workflows/
+├── smoke-tests/                         # 已创建：真实 -javaagent + OTLP HTTP Smoke Test
+├── testing/\n│   ├── common/                           # 已创建：共享测试依赖\n│   └── agent-for-testing/                # 已创建：独立测试 Agent 打包\n└── .github/workflows/
 ```
 
-当前已存在的项目为 `:agent`、`:custom`、`:dependencyManagement`；`buildSrc` 提供 Shadow 约定。上图的 `:bootstrap`、`:instrumentation`、`:smoke-tests` 是后续规划，**目前并不存在**。保留 `bootstrapLibs` Configuration 并不要求同时存在空的 `:bootstrap` 项目。
+当前已创建 `:agent`、`:bootstrap`、`:custom`、`:dependencyManagement`、`:instrumentation`、`:smoke-tests`、`:testing:common`、`:testing:agent-for-testing`，并实现 Java/Spotless/Muzzle/Shadow 构建约定。Splunk 专有产品模块（`:opamp`、`:profiler`、各应用服务器 Instrumentation）不属于基础设施对齐范围。
 
 ## 3. 依赖与类加载边界
 
@@ -85,14 +85,14 @@ flowchart TD
 - 发行物首先是可直接用 `-javaagent` 启动的单 JAR；Maven Central、签名、Docker/Operator 镜像等发布渠道待明确需求后增加。
 - 参考 Splunk 的 Java 格式、依赖收敛、许可证与发布元数据，但不为未确定的功能增加 CI Matrix。
 
-## 6. 当前范围和待定项
+## 6. 与 Splunk 的工程基础设施对齐清单
 
-- **工程骨架已创建，但这仍不是已批准的 ADR，也不代表产品功能已完成。**
-- 已提交 Gradle Wrapper、三模块项目、Shadow 约定插件和最小 ResourceProvider。
-- [GitHub Actions 首次打包](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40158405101)已通过 `:agent:shadowJar`、SPI、`inst/*.classdata`、版本资源及 Manifest 检查。
-- 按用户要求跳过独立 Research 原型；正式实施阶段目前仅完成构建与 JAR 内容检查，未运行应用级 Smoke Test。
+- **工程骨架已创建；当前目标是基础设施 1:1 对齐，不能把尚未实现的评测能力标为完成。**
+- 已提交 Gradle Wrapper、基础 Gradle 模块、Shadow 约定插件、Muzzle 约定、测试 Agent 和最小 ResourceProvider。
+- [GitHub Actions 首次打包](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40158405101)曾通过初始 `:agent:shadowJar`、SPI、`inst/*.classdata`、版本资源及 Manifest 检查；当前加入 Bootstrap、Spotless、Muzzle 和 Smoke Test 后，须以新一轮 CI 结果为准。
+- 本阶段已进入正式实施：常规 CI 包含 build/unit tests、Muzzle 发现、测试 Agent 打包、发行 JAR 检查、许可证报告和应用级 Smoke Test。最新结果以 Actions 为准。
 - 待明确：Datafox 第一批自定义能力、是否有 Bootstrap 可见类、是否新增 Instrumentation、最低 JVM、交付渠道。它们决定最终模块数量和构建任务。
 
-## 7. 工程设计原则
+## 7. 对齐边界与工程设计原则
 
-**Splunk 的工程结构与 Gradle 打包方式优先；OpenTelemetry 官方保证运行时契约；Datafox 只保留当前需要的代码。**
+**工程基础设施按 Splunk v2.32.0 对齐；OpenTelemetry 官方定义运行时契约；Splunk 产品专有功能不复制。**
