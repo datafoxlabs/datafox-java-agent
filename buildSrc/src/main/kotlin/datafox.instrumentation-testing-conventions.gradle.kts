@@ -24,7 +24,7 @@ dependencies {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-  configurations = listOf(configurations.runtimeClasspath.get(), testInstrumentation)
+  configurations = listOf(project.configurations.runtimeClasspath.get(), testInstrumentation)
   archiveFileName.set("agent-testing.jar")
 }
 
