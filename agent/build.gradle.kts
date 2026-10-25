@@ -45,6 +45,12 @@ tasks.named<Jar>("jar") {
   enabled = false
 }
 
+tasks.named<ProcessResources>("processResources") {
+  from(rootProject.file("licenses")) {
+    into("META-INF/licenses")
+  }
+}
+
 // 1. 重定位发行版新增的 Agent 类，并排除上游 Bootstrap 已提供的依赖。
 val relocateJavaagentLibs = tasks.register<ShadowJar>("relocateJavaagentLibs") {
   configurations = listOf(javaagentLibs)
@@ -93,6 +99,10 @@ tasks.named<ShadowJar>("shadowJar") {
   configurations = listOf(bootstrapLibs, upstreamAgent)
   dependsOn(isolateJavaagentLibs)
   from(isolateJavaagentLibs)
+
+  filesMatching("META-INF/licenses/licenses.md") {
+    path = path.replace("licenses.md", "licenses-datafox-javaagent.md")
+  }
 
   archiveClassifier.set("all")
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
