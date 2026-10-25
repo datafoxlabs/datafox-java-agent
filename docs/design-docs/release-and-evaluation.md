@@ -35,9 +35,9 @@ flowchart TB
 
 当前已配置 Linux 与 Windows 的 Java 8、11、17、21、25 测试组合。Gradle 本身始终由 Java 25 运行。轻量应用的源码单独编译为 Java 8 字节码，测试运行器使用 Java 17 字节码；由 Gradle 选择对应版本的子 JVM 执行真实 Agent，并向本地模拟 OTLP HTTP 接收端导出数据。
 
-测试不仅看是否存在 HTTP 请求，还解析 OTLP Protobuf，检查应用 Span 名称和 `telemetry.distro.name` / `telemetry.distro.version`。**配置已提交；是否全部成功以对应 CI 结果为准。**
+测试不仅看是否存在 HTTP 请求，还解析 OTLP Protobuf，检查应用 Span 名称和 `telemetry.distro.name` / `telemetry.distro.version`。**已通过 [2026-10-25 GitHub Actions](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40166248476) 的 10/10 个测试组合。**
 
-Java 8/11 已新增独立编译目标与矩阵配置，但**运行通过状态仍需以本次 CI 结果为准**；不能仅以源码编译目标推定兼容性。
+Java 8/11 的独立编译目标及 Linux/Windows 运行组合均已通过 CI；这里验证的是简单应用加载 Agent 并导出 OTLP，不能据此推导所有 Java 8/11 应用框架都已得到验证。
 
 ### Muzzle 和最新依赖测试
 
@@ -80,7 +80,7 @@ flowchart TD
 - 许可证报告归档 `licenses.zip`；
 - 全部文件对应的 `SHA256SUMS`，生成后立即进行校验。
 
-常规 CI 与正式 Release **复用同一个打包脚本**，避免出现“CI 可以打包，发布时执行另一套命令”的分叉。
+常规 CI 与正式 Release **复用同一个打包脚本**；普通 CI 已通过生成和复核校验和。版本标签触发的 GitHub Release 草稿尚未实际执行。
 
 ### Maven Central 与签名的现状
 
