@@ -93,6 +93,10 @@ flowchart TD
 - **普通 CI 只生成临时测试密钥，调用相同的签名脚本核对签名有效性，绝不会把临时测试密钥签出的 `.asc` 上传为正式发布产物。** 正式签名仅发生在受控的标签 Release 中。
 - GitHub Draft Release 已存在时，只允许更新草稿；如果同名 Release 已经公开，则拒绝覆盖。
 
+### Develocity Build Scan 的授权边界
+
+Gradle 构建脚本已接入与 Splunk `v2.32.0` 一致的 `com.gradle.develocity` 4.6.0。不同于 Splunk 由 CI 自动接受条款的方式，Datafox **默认不接受第三方构建数据上传**。只有项目管理员显式设置 GitHub Actions 仓库变量 `DATAFOX_BUILD_SCAN_CONSENT=yes`（或本地同名环境变量）后才启用上传；链接落在被忽略的 `build-scan.txt` 中。它影响构建诊断数据的流向，不影响 Agent 运行行为。
+
 ### Maven Central 与签名的现状
 
 根项目已配置与 Splunk 相似的 Nexus Publishing 插件及 Sonatype 地址，Agent 具备 Maven Publication / 条件化 GPG 签名设置。常规 CI 使用 `:agent:publishToMavenLocal` 验证 POM、无 classifier 主 JAR、Sources/Javadoc 的本地发布路径；不会进行远程发布。带标签的自动流程仅准备已签名的草稿 Release，只有 `workflow_dispatch` 且明确启用 `publish_maven` 才执行真实 Sonatype 发布。
