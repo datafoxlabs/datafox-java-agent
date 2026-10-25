@@ -28,4 +28,5 @@ include(
   ":smoke-tests",
   ":testing:common",
   ":testing:agent-for-testing",
+  ":testing:instrumentation-harness",
 )
