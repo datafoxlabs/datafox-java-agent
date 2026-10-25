@@ -16,6 +16,7 @@ on:
       - instrumentation/**
       - smoke-tests/**
       - testing/**
+      - scripts/**
       - gradle/**
       - gradlew
       - gradlew.bat
@@ -136,6 +137,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Generate third-party license report
         run: ./gradlew :agent:generateLicenseReport --no-daemon
+      - name: Assemble release artifacts
+        run: ./gradlew :agent:assemble :agent:generatePomFileForMavenPublication --no-daemon
+      - name: Verify checksummed release bundle
+        run: bash scripts/prepare-release.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: datafox-release-bundle
+          path: dist/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: datafox-license-report
