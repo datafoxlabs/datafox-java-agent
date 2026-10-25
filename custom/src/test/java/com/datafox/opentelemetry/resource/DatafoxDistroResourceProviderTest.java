@@ -2,7 +2,6 @@
  * Copyright Datafox Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.datafox.opentelemetry.resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

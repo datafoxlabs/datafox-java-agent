@@ -2,7 +2,6 @@
  * Copyright Datafox Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.datafox.opentelemetry.smoketest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,13 +32,15 @@ class AgentSmokeTest {
       collector.start();
 
       Path output = Files.createTempFile("datafox-agent-smoke", ".log");
-      Process process = createApplicationProcess(agentJar, classpath, collector.url("/").toString(), output);
+      Process process =
+          createApplicationProcess(agentJar, classpath, collector.url("/").toString(), output);
       try {
         assertTrue(process.waitFor(30, TimeUnit.SECONDS), "Smoke application did not exit");
         String log = Files.readString(output);
         assertEquals(0, process.exitValue(), log);
 
-        RecordedRequest request = collector.takeRequest(Duration.ofSeconds(10).toMillis(), TimeUnit.MILLISECONDS);
+        RecordedRequest request =
+            collector.takeRequest(Duration.ofSeconds(10).toMillis(), TimeUnit.MILLISECONDS);
         assertNotNull(request, "Agent did not send an OTLP request");
         assertEquals("/v1/traces", request.getPath());
       } finally {

@@ -2,7 +2,6 @@
  * Copyright Datafox Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.datafox.opentelemetry.resource;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -31,7 +30,9 @@ public final class DatafoxDistroResourceProvider implements ResourceProvider {
 
   private static Resource createDistroResource() {
     try (InputStream stream =
-        DatafoxDistroResourceProvider.class.getClassLoader().getResourceAsStream("datafox.properties")) {
+        DatafoxDistroResourceProvider.class
+            .getClassLoader()
+            .getResourceAsStream("datafox.properties")) {
       if (stream == null) {
         return Resource.empty();
       }

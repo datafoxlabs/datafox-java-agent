@@ -2,7 +2,6 @@
  * Copyright Datafox Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.datafox.opentelemetry.smoketest;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
