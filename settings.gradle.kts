@@ -6,6 +6,7 @@ pluginManagement {
   plugins {
     id("com.gradleup.shadow") version "9.6.1"
     id("com.diffplug.spotless") version "8.10.4"
+    id("com.github.jk1.dependency-license-report") version "3.1.4"
   }
 }
 
