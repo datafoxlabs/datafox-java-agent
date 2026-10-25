@@ -4,7 +4,8 @@
 
 ## 当前设计
 
-- [Datafox Java Agent：基于 Splunk 的 Gradle 发行版工程设计](datafox-gradle-distribution.md) — 草案；优先参考 Splunk v2.32.0 的模块组织和三阶段 Shadow 打包，OpenTelemetry 官方作为运行时契约依据。
+- [Datafox Java Agent：基于 Splunk 的 Gradle 发行版工程设计](datafox-gradle-distribution.md) — 实施中；工程基础设施按 Splunk v2.32.0 对齐，OpenTelemetry 官方作为运行时契约依据。
+- [Splunk 工程基础设施对齐清单](splunk-parity-checklist.md) — 记录 Gradle、Shadow、测试评测、CI 与发布体系的逐项差距。
 
 ## 文档约定
 
