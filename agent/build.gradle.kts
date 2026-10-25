@@ -40,12 +40,15 @@ val relocateJavaagentLibs = tasks.register<ShadowJar>("relocateJavaagentLibs") {
   duplicatesStrategy = DuplicatesStrategy.FAIL
 
   dependencies {
+    exclude(dependency("org.slf4j:slf4j-api"))
     exclude(dependency("io.opentelemetry:opentelemetry-api"))
     exclude(dependency("io.opentelemetry:opentelemetry-common"))
     exclude(dependency("io.opentelemetry:opentelemetry-context"))
     exclude(dependency("io.opentelemetry.semconv:opentelemetry-semconv"))
     exclude(dependency("io.opentelemetry.semconv:opentelemetry-semconv-incubating"))
     exclude(dependency("io.opentelemetry:opentelemetry-api-incubator"))
+    exclude(dependency("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"))
+    exclude(dependency("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator"))
   }
 }
 
