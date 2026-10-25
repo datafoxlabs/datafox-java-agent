@@ -76,6 +76,7 @@ jobs:
           jar tf "$AGENT" | grep -F 'inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider'
           unzip -p "$AGENT" inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
           unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Premain-Class: com.datafox.opentelemetry.javaagent.DatafoxAgent'
+          unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Implementation-Version: datafox-0.1.0-SNAPSHOT-otel-2.32.0'
       - name: Run Muzzle checks for configured Instrumentation modules
         shell: bash
         run: |
@@ -150,6 +151,16 @@ jobs:
         run: ./gradlew :agent:assemble :agent:generatePomFileForMavenPublication --no-daemon
       - name: Verify checksummed release bundle
         run: bash scripts/prepare-release.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: datafox-release-bundle
+          path: dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: datafox-license-report
+          path: licenses/
+          if-no-files-found: warn
       - name: Test GPG detached signatures with an ephemeral CI key
         shell: bash
         run: |
@@ -164,13 +175,3 @@ jobs:
           test -n "$GPG_KEY_ID"
           export GPG_SECRET_KEY="$(gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSWORD" --armor --export-secret-keys "$GPG_KEY_ID")"
           bash scripts/sign-release.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: datafox-release-bundle
-          path: dist/
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: datafox-license-report
-          path: licenses/
-          if-no-files-found: warn
