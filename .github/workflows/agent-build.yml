@@ -54,6 +54,14 @@ jobs:
         run: ./gradlew build --no-daemon
       - name: Build test Agent
         run: ./gradlew :testing:agent-for-testing:shadowJar --no-daemon
+      - name: Inspect packaged Agent
+        run: |
+          AGENT=agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar
+          test -s "$AGENT"
+          jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/resource/DatafoxDistroResourceProvider.classdata'
+          jar tf "$AGENT" | grep -F 'inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider'
+          unzip -p "$AGENT" inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
+          unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Premain-Class: com.datafox.opentelemetry.javaagent.DatafoxAgent'
       - name: Run Muzzle checks for configured Instrumentation modules
         shell: bash
         run: |
