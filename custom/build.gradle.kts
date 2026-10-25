@@ -26,3 +26,7 @@ val generateVersionProperties = tasks.register("generateVersionProperties") {
 tasks.named<ProcessResources>("processResources") {
   from(generateVersionProperties)
 }
+
+tasks.named<JavaCompile>("compileJava") {
+  options.release.set(8)
+}
