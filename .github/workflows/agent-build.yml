@@ -45,6 +45,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DATAFOX_BUILD_SCAN_CONSENT: ${{ vars.DATAFOX_BUILD_SCAN_CONSENT || 'no' }}
+
 jobs:
   build-and-unit-test:
     runs-on: ubuntu-latest
