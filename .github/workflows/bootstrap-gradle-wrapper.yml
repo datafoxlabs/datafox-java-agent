@@ -30,6 +30,7 @@ jobs:
           ./gradlew :agent:shadowJar --no-daemon
           jar tf agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar | grep -F 'inst/com/datafox/opentelemetry/resource/DatafoxDistroResourceProvider.classdata'
           jar tf agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar | grep -F 'inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider'
+          unzip -p agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
           unzip -p agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar META-INF/MANIFEST.MF | grep -F 'Premain-Class: io.opentelemetry.javaagent.OpenTelemetryAgent'
       - name: Commit Wrapper
         run: |
