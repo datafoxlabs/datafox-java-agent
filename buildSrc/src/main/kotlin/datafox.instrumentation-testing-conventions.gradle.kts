@@ -49,12 +49,27 @@ extra["testLatestDeps"] = testLatestDeps
 abstract class TestLatestDepsRule : ComponentMetadataRule {
   override fun execute(context: ComponentMetadataContext) {
     val version = context.details.id.version
-    if (listOf("-alpha", "-beta", "-rc", ".rc", "-m", ".m", ".alpha", ".beta", ".cr")
-        .any { version.contains(it, ignoreCase = true) }
-      || version.endsWith("-nf-execution")
-      || Regex("^.*-[0-9a-f]{7,}$").matches(version)) {
+    if (
+      version.contains("-alpha", true) ||
+      version.contains("-beta", true) ||
+      version.contains("-rc", true) ||
+      version.contains(".rc", true) ||
+      version.contains("-m", true) ||
+      version.contains(".m", true) ||
+      version.contains(".alpha", true) ||
+      version.contains(".beta", true) ||
+      version.contains(".cr", true) ||
+      version.endsWith("-nf-execution") ||
+      GIT_SHA_PATTERN.matches(version) ||
+      DATETIME_PATTERN.matches(version)
+    ) {
       context.details.status = "milestone"
     }
+  }
+
+  companion object {
+    private val GIT_SHA_PATTERN = Regex("^.*-[0-9a-f]{7,}$")
+    private val DATETIME_PATTERN = Regex("^\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}-\\d{2}.*$")
   }
 }
 
@@ -89,6 +104,12 @@ if (testLatestDeps) {
   dependencies.components.all<TestLatestDepsRule>()
   latestDepTestLibrary.dependencies.whenObjectAdded {
     val dependency = copy()
+    val declaredVersion = dependency.version
+    if (declaredVersion != null && dependency is ExternalModuleDependency) {
+      dependency.version {
+        strictly(declaredVersion)
+      }
+    }
     testImplementationConfiguration.dependencies.add(dependency)
   }
 }
