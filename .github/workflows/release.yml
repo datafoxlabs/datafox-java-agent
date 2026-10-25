@@ -36,20 +36,7 @@ jobs:
         run: ./gradlew :agent:assemble :agent:generateLicenseReport :agent:generatePomFileForMavenPublication --no-daemon
 
       - name: Prepare checksummed distribution
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          count="$(find agent/build/libs -maxdepth 1 -type f -name 'datafox-javaagent-*-all.jar' | wc -l)"
-          test "$count" -eq 1
-          cp agent/build/libs/datafox-javaagent-*-all.jar dist/
-          cp agent/build/libs/datafox-javaagent-*-sources.jar dist/
-          cp agent/build/libs/datafox-javaagent-*-javadoc.jar dist/
-          cp agent/build/publications/maven/pom-default.xml dist/datafox-javaagent.pom
-          test -d licenses
-          test -n "$(find licenses -type f -print -quit)"
-          zip -rq dist/licenses.zip licenses
-          (cd dist && sha256sum *.jar *.pom *.zip > SHA256SUMS)
+        run: bash scripts/prepare-release.sh
 
       - uses: actions/upload-artifact@v4
         with:
