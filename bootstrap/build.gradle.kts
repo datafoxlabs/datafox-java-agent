@@ -3,3 +3,7 @@ dependencies {
   compileOnly("io.opentelemetry:opentelemetry-api")
   compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
 }
+
+tasks.named<JavaCompile>("compileJava") {
+  options.release.set(8)
+}
