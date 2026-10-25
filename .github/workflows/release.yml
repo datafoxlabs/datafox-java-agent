@@ -32,8 +32,11 @@ jobs:
           [[ "$VERSION" != *-SNAPSHOT ]]
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]
 
+      - name: Generate license inventory
+        run: ./gradlew :agent:generateLicenseReport --no-daemon
+
       - name: Build release artifacts
-        run: ./gradlew :agent:assemble :agent:generateLicenseReport :agent:generatePomFileForMavenPublication --no-daemon
+        run: ./gradlew :agent:assemble :agent:generatePomFileForMavenPublication --no-daemon
 
       - name: Prepare checksummed distribution
         run: bash scripts/prepare-release.sh
