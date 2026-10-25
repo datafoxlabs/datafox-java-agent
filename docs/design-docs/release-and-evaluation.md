@@ -45,6 +45,8 @@ Java 8/11 的独立编译目标及 Linux/Windows 运行组合均已通过 CI；�
 
 当前没有 Datafox 自有 Instrumentation 子模块，所以 Latest Dependencies / Muzzle 的实际兼容性范围仍为空。工具链存在与版本兼容性得到实测是两回事。
 
+为验证测试约定本身，工程新增 `:testing:instrumentation-harness`（不纳入生产 Agent 的 `javaagentLibs`），应用 `datafox.instrumentation-conventions`。其测试检查实际 JVM 启动参数中存在 `-javaagent:`，并确认已向测试 JVM传入 Instrumentation 初始化 JAR 路径。测试任务依赖 `:testing:agent-for-testing:shadowJar` 与本模块的 Shadow JAR。**这验证的是工程测试链路，不代表 Datafox 已经拥有产品级 Instrumentation 或有效的 Muzzle 兼容性矩阵。**
+
 ## 2. Release：普通 CI 与发布标签的区别
 
 发布工作流：[release.yml](../../.github/workflows/release.yml)。
@@ -52,7 +54,8 @@ Java 8/11 的独立编译目标及 Linux/Windows 运行组合均已通过 CI；�
 它支持两种入口：
 
 1. **手动 `workflow_dispatch`**：打包和上传 `datafox-release-bundle`，不会创建 GitHub Release。这是安全的交付演练入口。
-2. **推送 `vX.Y.Z` 形式的标签**：先验证标签与 `version.gradle.kts` 的 `distroVersion` 一致且不是 `-SNAPSHOT`，再进行打包，创建 **Draft GitHub Release**，不直接公开发布。
+2. **推送 `vX.Y.Z` 形式的标签**：先验证标签与 `version.gradle.kts` 的 `distroVersion` 一致且不是 `-SNAPSHOT`，并检查 GPG 变量存在；随后生成、校验带分离式签名的发行制品，只创建 **Draft GitHub Release**，不直接公开发布。
+3. **手动在正式版本标签上勾选 `publish_maven=true`**：在上述签名和版本检查通过的基础上，还必须配置 Sonatype 凭据，才会执行 Splunk 风格的 `publishToSonatype` / `closeAndReleaseSonatypeStagingRepository`。普通手动触发不会上传 Maven Central，分支触发勾选此项会直接失败。
 
 ```mermaid
 flowchart TD
@@ -82,14 +85,24 @@ flowchart TD
 
 常规 CI 与正式 Release **复用同一个打包脚本**；普通 CI 已通过生成和复核校验和。版本标签触发的 GitHub Release 草稿尚未实际执行。
 
+### GPG 签名和 CI 验证如何区分？
+
+真正带标签的 Release 需要仓库 Secrets：`GPG_SECRET_KEY`（ASCII-armored 私钥）、`GPG_PASSWORD`（密钥口令）、`GPG_KEY_ID`（签名密钥 ID）；手动启用 Maven 上传时还需要 `SONATYPE_USER`、`SONATYPE_KEY`。
+
+- `scripts/sign-release.sh` 会在独立临时 GnuPG 目录中导入密钥，对 JAR、POM、许可证 ZIP 分别生成 `.asc` 分离式签名，再重新计算 `SHA256SUMS` 并对校验文件本身签名；执行后立即进行 GPG 验签，临时密钥目录自动清理。
+- **普通 CI 只生成临时测试密钥，调用相同的签名脚本核对签名有效性，绝不会把临时测试密钥签出的 `.asc` 上传为正式发布产物。** 正式签名仅发生在受控的标签 Release 中。
+- GitHub Draft Release 已存在时，只允许更新草稿；如果同名 Release 已经公开，则拒绝覆盖。
+
 ### Maven Central 与签名的现状
 
-根项目已配置与 Splunk 相似的 Nexus Publishing 插件及 Sonatype 地址，Agent 具备 Maven Publication / 条件化 GPG 签名设置。但**自动上传 Maven Central、GPG 密钥注入与正式签名流程尚未启用**。
+根项目已配置与 Splunk 相似的 Nexus Publishing 插件及 Sonatype 地址，Agent 具备 Maven Publication / 条件化 GPG 签名设置。常规 CI 使用 `:agent:publishToMavenLocal` 验证 POM、无 classifier 主 JAR、Sources/Javadoc 的本地发布路径；不会进行远程发布。带标签的自动流程仅准备已签名的草稿 Release，只有 `workflow_dispatch` 且明确启用 `publish_maven` 才执行真实 Sonatype 发布。
+
+**Maven Central 远程上传仍未实际执行，因此不能宣称发布权限、密钥或 Central Portal 端到端流程已经通过。**
 
 请区分“Gradle 已能生成 POM / 准备发布”和“已经向 Maven Central 成功发布”。当前版本仍为 `0.1.0-SNAPSHOT`，没有执行任何真实公开发布。
 
 ## 3. 仍然存在的工程差距
 
-相对 Splunk v2.32.0，当前差距主要集中于：生产级应用服务器矩阵、确实存在目标 Instrumentation 时的 Muzzle 与 latest-dependency 实测、完整发布签名与 Maven Central 实际交付、Build Scan / Develocity 集成。Splunk 的 Profiling、OpAMP、No-code 和商用服务器支持是产品能力，不应因“工程 1:1”而复制。
+相对 Splunk v2.32.0，当前差距主要集中于：生产级应用服务器矩阵、确实存在目标 Instrumentation 时的 Muzzle 与 latest-dependency 实测、正式 GPG/签名密钥与 Maven Central 实际交付、Build Scan / Develocity 集成。Splunk 的 Profiling、OpAMP、No-code 和商用服务器支持是产品能力，不应因“工程 1:1”而复制。
 
 对齐进度的权威清单是 [splunk-parity-checklist.md](splunk-parity-checklist.md)，而不是将工作流文件存在视为相关行为已经通过。
