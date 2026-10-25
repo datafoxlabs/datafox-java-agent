@@ -1,7 +1,7 @@
 # Datafox Java Agent 架构
 
-状态：工程设计阶段（尚未创建 Gradle 项目或 Agent 代码）
-更新日期：2026-10-23
+状态：最小 Gradle 发行版工程已建立；尚未进行应用级 Smoke Test
+更新日期：2026-10-25
 
 ## System Purpose
 
@@ -9,9 +9,9 @@ Datafox Java Agent 是基于 OpenTelemetry Java Instrumentation 的定制发行�
 
 ## Code Map
 
-**当前仓库事实：** 已安装 RepoFoundryAI Harness，维护研究文档和 GitHub Actions；尚无 `settings.gradle.kts`、Gradle Wrapper、Java 源码或可运行 Agent。
+**当前仓库事实：** 已建立 `settings.gradle.kts`、Gradle 9.8.1 Wrapper、`:agent`、`:custom`、`:dependencyManagement` 和 `buildSrc`。`:custom` 通过 `ResourceProvider` 提供 `telemetry.distro.name` 与 `telemetry.distro.version`；`:agent` 实现 Splunk 风格的三阶段 Shadow 打包。已在 GitHub Actions 中成功生成发行版 JAR 并检查内部类、SPI 和 Manifest 资源。
 
-**目标结构（尚未实施）：** 工程组织和 Gradle 打包优先参考 [Splunk Java Agent v2.32.0](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)。以 `:agent` 为发行包构建入口；按真实功能增加 `:custom`、`:bootstrap`、`:instrumentation:*`、`:dependencyManagement` 和测试模块。
+**模块取舍：** 工程组织和 Gradle 打包优先参考 [Splunk Java Agent v2.32.0](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)。以 `:agent` 为发行包构建入口，当前包含 `:custom` 和 `:dependencyManagement`。没有真正的 Bootstrap Helper、额外 Instrumentation 时，不创建空模块；后续功能需要时再添加。
 
 详细设计见 [基于 Splunk 的 Gradle 发行版工程设计草案](docs/design-docs/datafox-gradle-distribution.md)。
 
@@ -44,15 +44,15 @@ flowchart TB
 
 ## Cross-cutting Concerns
 
-版本：发行版版本与 OpenTelemetry 上游版本分别记录。源码研究基线为 Splunk `v2.32.0` 和 OpenTelemetry Instrumentation `v2.32.0`，尚未形成 Datafox 的构建版本锁定。
+版本：当前 Datafox 开发版本 `0.1.0-SNAPSHOT`，上游 Agent 与 Instrumentation `2.32.0`，SDK `1.66.0`，Gradle `9.8.1`，Shadow `9.6.1`；发行版版本和上游版本分别维护。
 
 文档：优先使用中文；技术 API、Gradle Task、RepoFoundryAI 机器识别字段保持原名。
 
 ## Known Gaps
 
-- 未建立 Gradle 工程及实际 Java Agent JAR。
+- 已构建 Agent JAR，但尚未运行目标 JVM 应用或检查实际 OTLP 遥测行为；只完成 Gradle 打包与 JAR 内容检查。
 - 首批 Datafox 自定义能力、最低 JVM 和发布渠道尚未确定。
-- 按要求跳过独立 Research 原型；未执行构建、运行或性能测试。
+- 按要求跳过独立 Research 原型；正式实施期间已执行构建与 JAR 检查，未执行应用级运行或性能测试。
 
 ## Sources
 
