@@ -175,3 +175,14 @@ jobs:
           test -n "$GPG_KEY_ID"
           export GPG_SECRET_KEY="$(gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSWORD" --armor --export-secret-keys "$GPG_KEY_ID")"
           bash scripts/sign-release.sh
+          ./gradlew :agent:publishToMavenLocal --no-daemon
+          VERSION="$(sed -n 's/^val distroVersion = "\([^"]*\)"/\1/p' version.gradle.kts)"
+          MAVEN_DIR="$HOME/.m2/repository/com/datafox/datafox-javaagent/$VERSION"
+          for artifact in \
+            "$MAVEN_DIR/datafox-javaagent-$VERSION.jar" \
+            "$MAVEN_DIR/datafox-javaagent-$VERSION.pom" \
+            "$MAVEN_DIR/datafox-javaagent-$VERSION-sources.jar" \
+            "$MAVEN_DIR/datafox-javaagent-$VERSION-javadoc.jar"; do
+            test -s "$artifact.asc"
+            gpg --batch --verify "$artifact.asc" "$artifact"
+          done
