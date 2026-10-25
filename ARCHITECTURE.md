@@ -1,6 +1,6 @@
 # Datafox Java Agent 架构
 
-状态：Splunk 风格基础设施首轮 CI 通过；尚未实现 Datafox 专有 Instrumentation
+状态：Splunk 风格工程基础设施通过 Java 8–25 × Linux/Windows 的 10 组 Smoke Test；尚无 Datafox 专有 Instrumentation
 更新日期：2026-10-25
 
 ## System Purpose
@@ -50,7 +50,7 @@ flowchart TB
 
 ## Known Gaps
 
-- 首轮只验证了 JAR 打包与内容；新增的 MockWebServer + 子 JVM Smoke Test 尚待最新 CI 结果确认。
+- 首轮只验证了 JAR 打包与内容；增强后的 MockWebServer + 子 JVM Smoke Test 已在 Ubuntu/Windows × Java 8、11、17、21、25 全部通过；详见 [GitHub Actions](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40166248476)。
 - 尚未添加 Datafox 专有 Instrumentation，因此 Muzzle 约定存在但当前没有目标模块。
 - 最新依赖测试矩阵、跨操作系统应用服务器矩阵和正式发布渠道仍需按 Datafox 支持范围配置。
 
