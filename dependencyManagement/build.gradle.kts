@@ -19,6 +19,7 @@ dependencies {
     api("org.slf4j:slf4j-api:2.0.20")
     api("org.slf4j:slf4j-simple:2.0.20")
     api("com.squareup.okhttp3:mockwebserver:4.12.0")
+    api("io.opentelemetry.proto:opentelemetry-proto:1.11.1-alpha")
     api("io.opentelemetry:opentelemetry-sdk-testing:1.66.0")
   }
 }
