@@ -35,7 +35,7 @@ CI 使用 JDK 25 运行 Gradle；发行版 Java 主代码目标为 Java 8。Grad
 
 ## CI 与评测
 
-GitHub Actions 包含 Gradle build / unit test、测试 Agent 打包、JAR 内容检查、Muzzle 发现与执行、最新依赖模式、最终 Agent Smoke Test 和第三方许可证报告。Muzzle 与 latest-dependency 测试在新增对应 Instrumentation 模块后才会有实际目标。Smoke Test 已配置 Linux/Windows × Java 17/21/25 的应用 JVM 矩阵，Gradle 由 Java 25 运行；新矩阵的通过情况以 GitHub Actions 为准。
+GitHub Actions 包含 Gradle build / unit test、测试 Agent 打包、JAR 内容检查、Muzzle 发现与执行、最新依赖模式、最终 Agent Smoke Test 和第三方许可证报告。Muzzle 与 latest-dependency 测试在新增对应 Instrumentation 模块后才会有实际目标。Smoke Test 已配置 Linux/Windows × Java 8/11/17/21/25 的应用 JVM 矩阵，Gradle 由 Java 25 运行；新矩阵的通过情况以 GitHub Actions 为准。
 
 ## Release
 
