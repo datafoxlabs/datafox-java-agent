@@ -14,6 +14,10 @@ tasks.named<Test>("test") {
   dependsOn(agentJar)
   inputs.file(agentJar.flatMap { it.archiveFile })
   systemProperty("datafox.agent.jar", agentJar.get().archiveFile.get().asFile.absolutePath)
+  val smokeTestJavaHome = providers.environmentVariable("SMOKE_TEST_JAVA_HOME").orNull
+  if (smokeTestJavaHome != null) {
+    systemProperty("datafox.smoke.javaHome", smokeTestJavaHome)
+  }
   systemProperty("datafox.smoke.classpath", sourceSets.test.get().runtimeClasspath.asPath)
   testLogging.showStandardStreams = true
 }
