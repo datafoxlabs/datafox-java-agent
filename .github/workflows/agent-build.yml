@@ -1,0 +1,60 @@
+name: Build Datafox Java Agent
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - agent/**
+      - custom/**
+      - buildSrc/**
+      - dependencyManagement/**
+      - gradle/**
+      - gradlew
+      - gradlew.bat
+      - settings.gradle.kts
+      - build.gradle.kts
+      - version.gradle.kts
+      - README.md
+      - .github/workflows/bootstrap-gradle-wrapper.yml
+  pull_request:
+    paths:
+      - agent/**
+      - custom/**
+      - buildSrc/**
+      - dependencyManagement/**
+      - gradle/**
+      - gradlew
+      - gradlew.bat
+      - settings.gradle.kts
+      - build.gradle.kts
+      - version.gradle.kts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build Agent JAR
+        run: ./gradlew :agent:shadowJar --no-daemon
+      - name: Inspect packaged Agent
+        run: |
+          AGENT=agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar
+          test -s "$AGENT"
+          jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/resource/DatafoxDistroResourceProvider.classdata'
+          jar tf "$AGENT" | grep -F 'inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider'
+          unzip -p "$AGENT" inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
+          unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Premain-Class: io.opentelemetry.javaagent.OpenTelemetryAgent'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: datafox-javaagent
+          path: agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar
+          if-no-files-found: error
