@@ -43,7 +43,6 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-  options.release.set(8)
   options.compilerArgs.add("-Xlint:-options")
 }
 
