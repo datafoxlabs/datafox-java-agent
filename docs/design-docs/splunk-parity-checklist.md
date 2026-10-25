@@ -19,7 +19,7 @@
 | Java 编译与测试约定 | 已实现并通过 CI | Java 主代码使用 `release=8`；测试按测试框架所需 JDK 编译 |
 | Spotless / Google Java Format / Kotlin DSL 格式 | 已实现并通过 CI | 已接入 `check`，首次格式问题已修复 |
 | 依赖许可证报告 | 已实现并通过 CI | `:agent:generateLicenseReport` 与 CI Artifact |
-| Build Scan / Develocity | 待补齐 | Gradle 构建可观测性尚未对齐，暂不影响打包 |
+| Build Scan / Develocity | 已接入，待 CI 确认 | Splunk 4.6.0 插件；默认禁止上传，设置 Actions 变量 `DATAFOX_BUILD_SCAN_CONSENT=yes` 后才同意向外部服务上传构建数据 |
 
 ## 2. Agent 打包与 Shadow
 
