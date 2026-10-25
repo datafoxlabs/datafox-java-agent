@@ -52,7 +52,8 @@ class AgentSmokeTest {
 
   private static Process createApplicationProcess(
       String agentJar, String classpath, String endpoint, Path output) throws IOException {
-    String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+    String javaHome = System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
+    String java = Path.of(javaHome, "bin", "java").toString();
     ProcessBuilder builder =
         new ProcessBuilder(
             java,
