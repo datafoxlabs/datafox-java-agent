@@ -11,5 +11,8 @@ tasks.named<Test>("test") {
   inputs.file(agentJar.flatMap { it.archiveFile })
   systemProperty("datafox.agent.jar", agentJar.get().archiveFile.get().asFile.absolutePath)
   systemProperty("datafox.smoke.classpath", sourceSets.test.get().runtimeClasspath.asPath)
+  tasks.named<JavaCompile>("compileTestJava") {
+    options.release.set(17)
+  }
   testLogging.showStandardStreams = true
 }
