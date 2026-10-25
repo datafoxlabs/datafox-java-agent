@@ -1,6 +1,6 @@
 # Repository Guidance
 
-<!-- BOOTSTRAP_TODO: Replace unknowns with verified repository facts. -->
+<!-- 工程构建约定见 README.md 和 ARCHITECTURE.md；执行方式以 GitHub Actions 为准。 -->
 
 ## Start Here
 
@@ -45,7 +45,7 @@
 
 ## Verification
 
-<!-- BOOTSTRAP_TODO: List the exact build, test, lint, and Harness validation commands. -->
+当前 Gradle 发行版构建命令：`./gradlew :agent:shadowJar`，产物位于 `agent/build/libs/`。GitHub Actions 工作流 `.github/workflows/agent-build.yml` 执行打包、JAR 结构和 Manifest 检查，并上传构建 Artifact。
 
 - Run checks relevant to the changed behavior and risk; documentation-only edits need documentation checks.
 - Validate observable behavior, not only file creation or compilation.
