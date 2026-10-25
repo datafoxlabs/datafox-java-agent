@@ -37,9 +37,15 @@ CI 使用 JDK 25 运行 Gradle；发行版 Java 主代码目标为 Java 8。Grad
 
 GitHub Actions 包含 Gradle build / unit test、测试 Agent 打包、JAR 内容检查、Muzzle 发现与执行、最新依赖模式、最终 Agent Smoke Test 和第三方许可证报告。Muzzle 与 latest-dependency 测试在新增对应 Instrumentation 模块后才会有实际目标。Smoke Test 已配置 Linux/Windows × Java 8/11/17/21/25 的应用 JVM 矩阵，Gradle 由 Java 25 运行；[最新 CI 的全部 10 组组合](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40166248476) 均已通过。
 
+## Gradle 与 Instrumentation 测试
+
+普通 CI 已覆盖发行包、测试 Agent、JAR 结构、Maven 本地发布和一次性 GPG 测试签名。另有 `:testing:instrumentation-harness` 用于验证测试 JVM 真实注入了 `-javaagent`；它不进入产品发行包。
+
+构建诊断对齐 Splunk 的 Develocity 4.6.0，但**默认不上传 Build Scan**。只有仓库管理员显式设置 GitHub Actions 变量 `DATAFOX_BUILD_SCAN_CONSENT=yes` 后才会允许向第三方服务上传构建信息。
+
 ## Release
 
-发行包通过 [prepare-release.sh](scripts/prepare-release.sh) 汇总 Agent JAR、Sources/Javadoc、Maven POM 和许可证归档，并生成、核对 SHA-256 校验和。该流程已经过常规 CI 验证。[Release 工作流](.github/workflows/release.yml) 可以手动打包但不公开发布；只有推送与 `version.gradle.kts` 一致的非 Snapshot 版本标签，才会创建 **Draft GitHub Release**。Maven Central 远程发布与签名密钥尚未启用。
+发行包通过 [prepare-release.sh](scripts/prepare-release.sh) 汇总 Agent JAR、Sources/Javadoc、Maven POM 和许可证归档，并生成、核对 SHA-256 校验和。该流程已经过常规 CI 验证。[Release 工作流](.github/workflows/release.yml) 可以手动打包但不公开发布；只有推送与 `version.gradle.kts` 一致的非 Snapshot 版本标签，才会创建 **Draft GitHub Release**。标签发布需要配置 GPG 私钥、口令及密钥 ID；Maven Central 仅在版本标签上手动指定 `publish_maven=true` 且具备 Sonatype 凭据时才执行远程发布。正式生产签名和远程发布均尚未实际执行。
 
 ## 文档
 
