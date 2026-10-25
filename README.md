@@ -1,57 +1,48 @@
 # Datafox Java Agent
 
-基于 OpenTelemetry Java Agent 的定制发行版。工程组织和 Gradle 打包优先参考 [Splunk Java Agent v2.32.0](https://github.com/signalfx/splunk-otel-java/tree/v2.32.0)，运行时接口及 ClassLoader 契约以 [OpenTelemetry Java Instrumentation v2.32.0](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/v2.32.0) 为准。
+基于 OpenTelemetry Java Agent 的定制发行版。**工程、Gradle、Shadow 和评测体系以 Splunk Java Agent v2.32.0 为 1:1 对齐基线**；运行时接口、Agent 生命周期和 ClassLoader 契约以 [OpenTelemetry Java Instrumentation v2.32.0](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/v2.32.0) 为准。
 
 ## 工程结构
 
 | 模块 | 职责 |
 |---|---|
-| `:agent` | 组装最终 Java Agent JAR，包括 relocation、`inst/*.classdata` 隔离和 SPI 合并 |
-| `:custom` | 发行版专有能力；当前只通过 `ResourceProvider` 标识 `telemetry.distro.name=datafox` |
-| `:dependencyManagement` | 统一 OpenTelemetry SDK、Instrumentation、Agent 版本 |
-| `buildSrc` | 集中管理 Shadow 和 ClassLoader 相关的重定位规则 |
+| `:agent` | 组装发行版 JAR、Maven 主制品、Sources/Javadoc 和可选签名 |
+| `:bootstrap` | Splunk 风格的薄启动委托，最终调用上游 Agent |
+| `:custom` | 发行版 SDK/SPI 定制；当前提供 Datafox Resource 元数据 |
+| `:dependencyManagement` | 统一 SDK、Instrumentation、Agent、测试依赖版本 |
+| `:instrumentation` | 专有 Instrumentation 的聚合与 Muzzle 发现入口 |
+| `:smoke-tests` | 启动子 JVM，通过最终 Agent JAR 验证 OTLP HTTP 导出 |
+| `:testing:common` | 共享测试依赖 |
+| `:testing:agent-for-testing` | Instrumentation 测试使用的 Agent JAR |
+| `buildSrc` | Java、Spotless、Shadow、Muzzle 和 Instrumentation 测试约定 |
 
-工程定义保留 `bootstrapLibs`、`javaagentLibs`、`upstreamAgent` 三种依赖配置。当前**没有单独的 Bootstrap 类库**，所以没有创建空的 `:bootstrap` 模块；确有相关功能时再添加。`instrumentation`、Profiler、OpAMP 也按需增加，不预置演示功能。
+工程保留 Splunk 的 `upstreamAgent`、`bootstrapLibs`、`javaagentLibs` 三种 Configuration，并使用 `relocateJavaagentLibs` → `isolateJavaagentLibs` → `shadowJar` 三阶段打包。**不采用独立或内嵌 Extension JAR 作为发行架构**，但允许发行版内部使用官方 SPI。
+
+Splunk 的 OpAMP、Profiler、No-code、专有应用服务器 Instrumentation 等产品功能不在基础设施对齐范围；有 Datafox 需求时再单独引入。
 
 ## 构建
 
-构建 JVM 使用 Java 21，Gradle Wrapper 为 9.8.1，Shadow 为 9.6.1，代码采用 Java 8 兼容字节码（`options.release=8`）。
+CI 使用 JDK 25 运行 Gradle；发行版 Java 主代码目标为 Java 8。Gradle Wrapper 固定 9.8.1，Shadow 固定 9.6.1。
 
 ```bash
+./gradlew build
 ./gradlew :agent:shadowJar
+./gradlew :smoke-tests:test
+./gradlew :agent:generateLicenseReport
 ```
 
-预期发行包位于：
+发行物包括直接分发的 `-all.jar` 与 Maven Publication 使用的无 classifier 主 JAR。开发版本当前为 `0.1.0-SNAPSHOT`，不代表稳定发布承诺。
 
-```text
-agent/build/libs/datafox-javaagent-0.1.0-SNAPSHOT.jar
-```
+## CI 与评测
 
-其中 `0.1.0-SNAPSHOT` 是当前开发占位版本，不代表稳定发行承诺。构建过程仍使用上游 Agent 的 `OpenTelemetryAgent` 作为 `Premain-Class`，不复制 Splunk 的品牌启动器。
+GitHub Actions 包含 Gradle build / unit test、测试 Agent 打包、JAR 内容检查、Muzzle 发现与执行、最新依赖模式、最终 Agent Smoke Test 和第三方许可证报告。Muzzle 与 latest-dependency 测试在新增对应 Instrumentation 模块后才会有实际目标；跨操作系统和应用服务器矩阵仍需根据 Datafox 的支持范围补齐。
 
-Gradle 采用 Splunk 的三阶段打包：
+## 文档
 
-```text
-javaagentLibs → relocateJavaagentLibs → isolateJavaagentLibs ┐
-bootstrapLibs ────────────────────────────────────────────────┼→ shadowJar
-upstreamAgent ─────────────────────────────────────────────────┘
-```
+- [架构说明](ARCHITECTURE.md)
+- [Splunk 对齐清单](docs/design-docs/splunk-parity-checklist.md)
+- [Datafox Gradle 工程设计](docs/design-docs/datafox-gradle-distribution.md)
+- [R-001：OpenTelemetry 官方 Distro 研究](docs/research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md)
+- [R-002：Splunk Gradle 与 Shadow 研究](docs/research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md)
 
-自定义类直接按 AgentClassLoader 的 `inst/` 布局进入最终发行包，**不使用独立或内嵌 Extension JAR 作为发行架构**。发行版仍通过官方 SPI 扩展 SDK 行为。
-
-## 配置与兼容
-
-优先使用上游标准 `otel.*` 配置；新增 Datafox 专有参数时使用 `datafox.*`。当前没有自定义配置参数、远程管理或 Profiler。
-
-## 云端开发
-
-使用 GitHub MCP 修改代码，GitHub Actions 运行 Gradle；不依赖本地开发环境。
-
-详细资料：
-
-- [ARCHITECTURE.md](ARCHITECTURE.md)
-- [Datafox Gradle 设计](docs/design-docs/datafox-gradle-distribution.md)
-- [R-001：官方 Distro 研究](docs/research/active/r-001_opentelemetry-javaagent-upstream/SYNTHESIS.md)
-- [R-002：Splunk Gradle 和 Shadow 研究](docs/research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md)
-
-以上是工程实施说明，不代表已完成应用级 Smoke Test；构建和 JAR 检查结果以 GitHub Actions 的实际执行记录为准。
+以上是工程实现与目标范围说明。构建、打包和应用级 Smoke Test 的通过状态以最新 [GitHub Actions 记录](https://github.com/datafoxlabs/datafox-java-agent/actions/workflows/agent-build.yml) 为准。
