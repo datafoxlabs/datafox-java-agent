@@ -24,3 +24,14 @@ tasks.register("listMuzzleInstrumentations") {
       .forEach(::println)
   }
 }
+
+tasks.register("listInstrumentationModules") {
+  group = "Help"
+  description = "List instrumentation modules using Datafox instrumentation conventions"
+  doLast {
+    subprojects
+      .filter { it.plugins.hasPlugin("datafox.instrumentation-testing-conventions") }
+      .map { it.path }
+      .forEach(::println)
+  }
+}
