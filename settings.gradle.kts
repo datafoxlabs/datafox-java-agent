@@ -11,6 +11,25 @@ pluginManagement {
   }
 }
 
+plugins {
+  id("com.gradle.develocity") version "4.6.0"
+}
+
+develocity {
+  buildScan {
+    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    // Do not transmit build metadata to Gradle's service without an explicit opt-in.
+    termsOfUseAgree = if (System.getenv("DATAFOX_BUILD_SCAN_CONSENT") == "yes") "yes" else "no"
+    uploadInBackground = System.getenv("CI") == null
+
+    if (System.getenv("DATAFOX_BUILD_SCAN_CONSENT") == "yes") {
+      buildScanPublished {
+        File("build-scan.txt").writeText(buildScanUri.toString())
+      }
+    }
+  }
+}
+
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
