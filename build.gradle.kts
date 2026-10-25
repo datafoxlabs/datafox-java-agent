@@ -27,3 +27,11 @@ nexusPublishing {
     }
   }
 }
+
+if (System.getenv("CI") != null) {
+  subprojects {
+    configurations.configureEach {
+      resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+    }
+  }
+}
