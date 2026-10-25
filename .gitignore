@@ -4,3 +4,5 @@
 .idea/
 *.iml
 dist/
+
+build-scan.txt
