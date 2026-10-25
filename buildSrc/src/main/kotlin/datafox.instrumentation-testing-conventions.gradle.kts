@@ -36,10 +36,18 @@ tasks.withType<Test>().configureEach {
 
   dependsOn(testAgent, instrumentationJar)
   inputs.file(instrumentationJar.flatMap { it.archiveFile })
+  jvmArgumentProviders.add(DatafoxJavaagentProvider(testAgent.flatMap { it.archiveFile }))
   jvmArgs("-Dotel.javaagent.debug=true")
   jvmArgs("-Dotel.javaagent.experimental.initializer.jar=${instrumentationJar.get().archiveFile.get().asFile.absolutePath}")
   jvmArgs("-Dotel.javaagent.testing.additional-library-ignores.enabled=false")
   jvmArgs("-Dotel.javaagent.testing.fail-on-context-leak=true")
+  jvmArgs("-Dotel.javaagent.testing.transform-safe-logging.enabled=true")
+  jvmArgs("-Dotel.javaagent.add-thread-details=false")
+
+  val buildDirectory = layout.buildDirectory.get().asFile
+  val mainClasses = buildDirectory.resolve("classes/java/main")
+  val mainResources = buildDirectory.resolve("resources/main")
+  classpath = classpath.filter { it != mainClasses && it != mainResources }
 }
 
 val testLatestDeps = gradle.startParameter.projectProperties["testLatestDeps"] == "true"
@@ -137,4 +145,14 @@ sourceSets {
   main {
     output.dir("build/generated/instrumentationVersion", "builtBy" to "generateInstrumentationVersionFile")
   }
+}
+
+// Run Instrumentation tests against the packaged Agent, not just the application classpath.
+class DatafoxJavaagentProvider(
+  @InputFile
+  @PathSensitive(PathSensitivity.RELATIVE)
+  val agentJar: Provider<RegularFile>,
+) : CommandLineArgumentProvider {
+  override fun asArguments(): Iterable<String> =
+    listOf("-javaagent:${agentJar.get().asFile.absolutePath}")
 }
