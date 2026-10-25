@@ -1,6 +1,6 @@
 # Datafox Java Agent：基于 Splunk 的 Gradle 发行版工程设计（草案）
 
-状态：Splunk 工程基础设施 1:1 对齐实施中；2026-10-25。**工程结构与 Gradle 打包优先参考 Splunk v2.32.0；运行时接口与类加载契约以 OpenTelemetry Java Instrumentation v2.32.0 为准。**
+状态：Splunk 工程基础设施 1:1 对齐实施中；2026-10-25。首轮 build、打包与 Smoke Test 已通过。**工程结构与 Gradle 打包优先参考 Splunk v2.32.0；运行时接口与类加载契约以 OpenTelemetry Java Instrumentation v2.32.0 为准。**
 
 依据：
 - [R-002：Splunk 发行版架构研究](../research/active/r-002_splunk-java-agent-architecture/SYNTHESIS.md)
@@ -89,8 +89,8 @@ flowchart TD
 
 - **工程骨架已创建；当前目标是基础设施 1:1 对齐，不能把尚未实现的评测能力标为完成。**
 - 已提交 Gradle Wrapper、基础 Gradle 模块、Shadow 约定插件、Muzzle 约定、测试 Agent 和最小 ResourceProvider。
-- [GitHub Actions 首次打包](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40158405101)曾通过初始 `:agent:shadowJar`、SPI、`inst/*.classdata`、版本资源及 Manifest 检查；当前加入 Bootstrap、Spotless、Muzzle 和 Smoke Test 后，须以新一轮 CI 结果为准。
-- 本阶段已进入正式实施：常规 CI 包含 build/unit tests、Muzzle 发现、测试 Agent 打包、发行 JAR 检查、许可证报告和应用级 Smoke Test。最新结果以 Actions 为准。
+- [当前 GitHub Actions](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40160425301)已通过 `./gradlew build`、测试 Agent 打包、JAR 内容检查、许可证报告和应用级 Smoke Test。
+- 本阶段已进入正式实施：常规 CI 包含 build/unit tests、Muzzle 发现、测试 Agent 打包、发行 JAR 检查、许可证报告和应用级 Smoke Test。首轮通过；Muzzle 与 latest-dependency 任务目前因没有 Instrumentation 模块而无实际目标。
 - 待明确：Datafox 第一批自定义能力、是否有 Bootstrap 可见类、是否新增 Instrumentation、最低 JVM、交付渠道。它们决定最终模块数量和构建任务。
 
 ## 7. 对齐边界与工程设计原则
