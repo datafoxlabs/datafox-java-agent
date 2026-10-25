@@ -8,6 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+import io.opentelemetry.proto.common.v1.KeyValue;
+import io.opentelemetry.proto.trace.v1.ResourceSpans;
+import io.opentelemetry.proto.trace.v1.ScopeSpans;
+import io.opentelemetry.proto.trace.v1.Span;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +48,33 @@ class AgentSmokeTest {
             collector.takeRequest(Duration.ofSeconds(10).toMillis(), TimeUnit.MILLISECONDS);
         assertNotNull(request, "Agent did not send an OTLP request");
         assertEquals("/v1/traces", request.getPath());
+        ExportTraceServiceRequest export =
+            ExportTraceServiceRequest.parseFrom(request.getBody().readByteArray());
+        boolean foundSpan = false;
+        boolean foundDistro = false;
+        boolean foundDistroVersion = false;
+        for (ResourceSpans resourceSpans : export.getResourceSpansList()) {
+          for (KeyValue attribute : resourceSpans.getResource().getAttributesList()) {
+            if (attribute.getKey().equals("telemetry.distro.name")
+                && attribute.getValue().getStringValue().equals("datafox")) {
+              foundDistro = true;
+            }
+            if (attribute.getKey().equals("telemetry.distro.version")
+                && attribute.getValue().getStringValue().equals("0.1.0-SNAPSHOT")) {
+              foundDistroVersion = true;
+            }
+          }
+          for (ScopeSpans scopeSpans : resourceSpans.getScopeSpansList()) {
+            for (Span span : scopeSpans.getSpansList()) {
+              if (span.getName().equals("datafox-smoke-span")) {
+                foundSpan = true;
+              }
+            }
+          }
+        }
+        assertTrue(foundSpan, "OTLP export is missing the application span");
+        assertTrue(foundDistro, "OTLP resource is missing the Datafox distro name");
+        assertTrue(foundDistroVersion, "OTLP resource is missing the Datafox distro version");
       } finally {
         process.destroyForcibly();
         Files.deleteIfExists(output);
