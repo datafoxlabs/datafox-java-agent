@@ -49,7 +49,7 @@
 | Muzzle generation/check 约定 | 已实现（按需应用） | 当前没有 Datafox Instrumentation 模块，因此没有 Muzzle 目标 |
 | `:instrumentation:listMuzzleInstrumentations` | 已实现 | CI 逐个执行已注册模块的 Muzzle 任务 |
 | 最终 Agent 应用级 Smoke Test | 增强待 CI 确认 | 子 JVM 加载最终 Agent，解析 OTLP Protobuf 检查 Span 及发行版资源属性 |
-| 跨 JDK / OS 矩阵 | 已接入，待 CI 确认 | Linux / Windows × 应用 JDK 17、21、25；Gradle 仍运行在 JDK 25 |
+| 跨 JDK / OS 矩阵 | 已扩展，待 CI 确认 | Linux / Windows × 应用 JDK 8、11、17、21、25；Gradle 仍运行在 JDK 25，应用夹具编译目标 Java 8 |
 | 应用服务器矩阵 | 按产品范围决定 | 尚未声明支持 Tomcat、Jetty、WebLogic 等特定容器 |
 | JMH 基准测试模块 | 待补齐 | 尚无需要量化的 Datafox 专有 Instrumentation 性能目标 |
 
