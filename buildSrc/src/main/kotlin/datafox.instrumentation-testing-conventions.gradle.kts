@@ -43,6 +43,21 @@ tasks.withType<Test>().configureEach {
 }
 
 val testLatestDeps = gradle.startParameter.projectProperties["testLatestDeps"] == "true"
+extra["testLatestDeps"] = testLatestDeps
+
+@CacheableRule
+abstract class TestLatestDepsRule : ComponentMetadataRule {
+  override fun execute(context: ComponentMetadataContext) {
+    val version = context.details.id.version
+    if (listOf("-alpha", "-beta", "-rc", ".rc", "-m", ".m", ".alpha", ".beta", ".cr")
+        .any { version.contains(it, ignoreCase = true) }
+      || version.endsWith("-nf-execution")
+      || Regex("^.*-[0-9a-f]{7,}$").matches(version)) {
+      context.details.status = "milestone"
+    }
+  }
+}
+
 val library = configurations.create("library") {
   isCanBeResolved = false
   isCanBeConsumed = false
@@ -71,6 +86,7 @@ listOf(library, testLibrary).forEach { configuration ->
 }
 
 if (testLatestDeps) {
+  dependencies.components.all<TestLatestDepsRule>()
   latestDepTestLibrary.dependencies.whenObjectAdded {
     val dependency = copy()
     testImplementationConfiguration.dependencies.add(dependency)
