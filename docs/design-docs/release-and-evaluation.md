@@ -33,11 +33,11 @@ flowchart TB
 
 ### 应用 JVM 测试矩阵
 
-当前已配置 Linux 与 Windows 的 Java 17、21、25 测试组合。Gradle 本身始终由 Java 25 运行。测试使用编译为 Java 17 的轻量应用，子 JVM 执行真实 Agent，向本地模拟 OTLP HTTP 接收端导出数据。
+当前已配置 Linux 与 Windows 的 Java 8、11、17、21、25 测试组合。Gradle 本身始终由 Java 25 运行。轻量应用的源码单独编译为 Java 8 字节码，测试运行器使用 Java 17 字节码；由 Gradle 选择对应版本的子 JVM 执行真实 Agent，并向本地模拟 OTLP HTTP 接收端导出数据。
 
 测试不仅看是否存在 HTTP 请求，还解析 OTLP Protobuf，检查应用 Span 名称和 `telemetry.distro.name` / `telemetry.distro.version`。**配置已提交；是否全部成功以对应 CI 结果为准。**
 
-如果后续声明支持 Java 8/11，应提供兼容字节码的独立应用夹具，再将其加入矩阵；不能仅以 Agent 源码使用 Java 8 编译目标来推定已完成运行测试。
+Java 8/11 已新增独立编译目标与矩阵配置，但**运行通过状态仍需以本次 CI 结果为准**；不能仅以源码编译目标推定兼容性。
 
 ### Muzzle 和最新依赖测试
 
