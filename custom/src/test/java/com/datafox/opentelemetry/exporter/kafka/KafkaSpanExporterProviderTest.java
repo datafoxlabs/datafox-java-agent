@@ -50,8 +50,7 @@ class KafkaSpanExporterProviderTest {
   @Test
   void requiresTopicBeforeConstructingProducer() {
     ConfigProperties config = mock(ConfigProperties.class);
-    when(config.getString("datafox.exporter.kafka.bootstrap-servers"))
-        .thenReturn("localhost:9092");
+    when(config.getString("datafox.exporter.kafka.bootstrap-servers")).thenReturn("localhost:9092");
     assertThrows(
         ConfigurationException.class, () -> new KafkaSpanExporterProvider().createExporter(config));
   }
@@ -59,8 +58,7 @@ class KafkaSpanExporterProviderTest {
   @Test
   void buildsAndClosesExporter() {
     ConfigProperties config = mock(ConfigProperties.class);
-    when(config.getString("datafox.exporter.kafka.bootstrap-servers"))
-        .thenReturn("localhost:9092");
+    when(config.getString("datafox.exporter.kafka.bootstrap-servers")).thenReturn("localhost:9092");
     when(config.getString("datafox.exporter.kafka.topic")).thenReturn("traces");
     when(config.getMap("datafox.exporter.kafka.producer"))
         .thenReturn(Collections.singletonMap("client.id", "datafox-test"));
