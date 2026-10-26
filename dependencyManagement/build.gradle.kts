@@ -17,6 +17,7 @@ dependencies {
     api("io.opentelemetry.javaagent:opentelemetry-javaagent-bootstrap:2.32.0")
     api("io.opentelemetry.javaagent:opentelemetry-agent-for-testing:2.32.0-alpha")
     api("org.apache.kafka:kafka-clients:3.9.2")
+    api("com.google.auto.service:auto-service:1.1.1")
     api("org.slf4j:slf4j-api:2.0.20")
     api("org.slf4j:slf4j-simple:2.0.20")
     api("com.squareup.okhttp3:mockwebserver:4.12.0")
