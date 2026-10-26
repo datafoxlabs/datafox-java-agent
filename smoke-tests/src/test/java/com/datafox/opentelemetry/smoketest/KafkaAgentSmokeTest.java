@@ -46,14 +46,14 @@ class KafkaAgentSmokeTest {
     assertNotNull(agentJar);
     assertNotNull(classpath);
 
-    try (KafkaContainer kafka =
-        new KafkaContainer(DockerImageName.parse("apache/kafka:3.9.1"))) {
+    try (KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("apache/kafka:3.9.1"))) {
       kafka.start();
 
       try (AdminClient admin =
           AdminClient.create(
               Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers()))) {
-        admin.createTopics(Collections.singletonList(new NewTopic(TOPIC, 1, (short) 1)))
+        admin
+            .createTopics(Collections.singletonList(new NewTopic(TOPIC, 1, (short) 1)))
             .all()
             .get(30, TimeUnit.SECONDS);
       }
@@ -100,7 +100,8 @@ class KafkaAgentSmokeTest {
           while (System.nanoTime() < deadline && !foundSpan) {
             ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(500));
             for (ConsumerRecord<String, byte[]> record : records) {
-              ExportTraceServiceRequest request = ExportTraceServiceRequest.parseFrom(record.value());
+              ExportTraceServiceRequest request =
+                  ExportTraceServiceRequest.parseFrom(record.value());
               for (ResourceSpans resource : request.getResourceSpansList()) {
                 for (ScopeSpans scope : resource.getScopeSpansList()) {
                   for (Span span : scope.getSpansList()) {
