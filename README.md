@@ -8,7 +8,7 @@
 |---|---|
 | `:agent` | 组装发行版 JAR、Maven 主制品、Sources/Javadoc 和可选签名 |
 | `:bootstrap` | Splunk 风格的薄启动委托，最终调用上游 Agent |
-| `:custom` | 发行版 SDK/SPI 定制；当前提供 Datafox Resource 元数据 |
+| `:custom` | 发行版 SDK/SPI 定制：Resource 元数据与 Kafka Span Exporter 自动配置 |
 | `:dependencyManagement` | 统一 SDK、Instrumentation、Agent、测试依赖版本 |
 | `:instrumentation` | 专有 Instrumentation 的聚合与 Muzzle 发现入口 |
 | `:smoke-tests` | 启动子 JVM，通过最终 Agent JAR 验证 OTLP HTTP 导出 |
@@ -19,6 +19,30 @@
 工程保留 Splunk 的 `upstreamAgent`、`bootstrapLibs`、`javaagentLibs` 三种 Configuration，并使用 `relocateJavaagentLibs` → `isolateJavaagentLibs` → `shadowJar` 三阶段打包。**不采用独立或内嵌 Extension JAR 作为发行架构**，但允许发行版内部使用官方 SPI。
 
 Splunk 的 OpAMP、Profiler、No-code、专有应用服务器 Instrumentation 等产品功能不在基础设施对齐范围；有 Datafox 需求时再单独引入。
+
+## Kafka Trace Exporter
+
+Datafox Java Agent 通过官方 `ConfigurableSpanExporterProvider` 提供 `kafka` 选项，直接复用 [DataFox Java Contrib Kafka Exporter](https://github.com/datafoxlabs/datafox-java-contrib/tree/main/kafka-exporter)。例如：
+
+```properties
+otel.traces.exporter=kafka
+otel.metrics.exporter=none
+otel.logs.exporter=none
+datafox.exporter.kafka.bootstrap-servers=localhost:9092
+datafox.exporter.kafka.topic=otel-traces
+```
+
+可选 `datafox.exporter.kafka.producer`：按 SDK map 配置语法传递 Kafka Producer 配置，例如 `acks=all,linger.ms=5`；明确声明的 `datafox.exporter.kafka.bootstrap-servers` 优先于 Map 中的 `bootstrap.servers`。Kafka Record 使用无 Key、OTLP Protobuf 二进制 Value，推荐保持默认 BatchSpanProcessor；`kafka` 启用时如果缺失 broker/topic，Agent SDK 初始化将报错。Java 8+ 运行时使用 Kafka Clients 3.9.2。
+
+Contrib 尚未发布 Maven 制品，所以本仓库使用固定提交的 Git submodule + Gradle composite build，仅对 Kafka Exporter 声明依赖替换。构建前必须拉取子模块：
+
+```shell
+git clone --recurse-submodules https://github.com/datafoxlabs/datafox-java-agent.git
+# 已经克隆的仓库：
+git submodule update --init --recursive
+```
+
+修改 Contrib 版本时，应显式更新子模块 Git SHA 并运行全部 Agent 测试。Contrib 升级不会由 Gradle 自动追踪 `main`。
 
 ## 构建
 

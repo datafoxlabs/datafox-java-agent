@@ -49,3 +49,9 @@ include(
   ":testing:agent-for-testing",
   ":testing:instrumentation-harness",
 )
+
+includeBuild("third_party/datafox-java-contrib") {
+  dependencySubstitution {
+    substitute(module("com.datafox:datafox-kafka-exporter")).using(project(":kafka-exporter"))
+  }
+}

@@ -66,6 +66,12 @@ val relocateJavaagentLibs = tasks.register<ShadowJar>("relocateJavaagentLibs") {
     exclude(dependency("io.opentelemetry:opentelemetry-api"))
     exclude(dependency("io.opentelemetry:opentelemetry-common"))
     exclude(dependency("io.opentelemetry:opentelemetry-context"))
+    // The upstream Agent already ships the OTel SDK and OTLP marshaler classes.
+    // Do not package duplicate SDK classes in the isolated distribution libraries.
+    exclude(dependency("io.opentelemetry:opentelemetry-sdk-.*"))
+    exclude(dependency("io.opentelemetry:opentelemetry-exporter-otlp-common"))
+    exclude(dependency("io.opentelemetry:opentelemetry-exporter-otlp"))
+    exclude(dependency("io.opentelemetry:opentelemetry-exporter-common"))
     exclude(dependency("io.opentelemetry.semconv:opentelemetry-semconv"))
     exclude(dependency("io.opentelemetry.semconv:opentelemetry-semconv-incubating"))
     exclude(dependency("io.opentelemetry:opentelemetry-api-incubator"))

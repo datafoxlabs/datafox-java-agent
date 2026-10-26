@@ -21,6 +21,8 @@ on:
       - gradlew
       - gradlew.bat
       - settings.gradle.kts
+      - .gitmodules
+      - third_party/**
       - build.gradle.kts
       - version.gradle.kts
       - .github/workflows/agent-build.yml
@@ -38,6 +40,8 @@ on:
       - gradlew
       - gradlew.bat
       - settings.gradle.kts
+      - .gitmodules
+      - third_party/**
       - build.gradle.kts
       - version.gradle.kts
   workflow_dispatch:
@@ -53,6 +57,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -77,6 +83,9 @@ jobs:
           test -s "$AGENT"
           jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/resource/DatafoxDistroResourceProvider.classdata'
           jar tf "$AGENT" | grep -F 'inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider'
+          jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/exporter/kafka/KafkaSpanExporterProvider.classdata'
+          jar tf "$AGENT" | grep -F 'inst/com/datafox/contrib/kafka/KafkaSpanExporter.classdata'
+          unzip -p "$AGENT" inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.traces.ConfigurableSpanExporterProvider | grep -F 'KafkaSpanExporterProvider'
           unzip -p "$AGENT" inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
           unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Premain-Class: com.datafox.opentelemetry.javaagent.DatafoxAgent'
           unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Implementation-Version: datafox-0.1.0-SNAPSHOT-otel-2.32.0'
@@ -99,6 +108,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -124,6 +135,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - id: application-java
         uses: actions/setup-java@v4
         with:
@@ -143,6 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
