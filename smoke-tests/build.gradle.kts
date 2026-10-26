@@ -2,6 +2,8 @@ dependencies {
   implementation("io.opentelemetry:opentelemetry-api")
   testImplementation("com.squareup.okhttp3:mockwebserver")
   testImplementation("io.opentelemetry.proto:opentelemetry-proto")
+  testImplementation("org.apache.kafka:kafka-clients")
+  testImplementation("org.testcontainers:testcontainers-kafka:2.0.5")
 }
 
 tasks.named<JavaCompile>("compileJava") {
