@@ -6,6 +6,8 @@ dependencies {
   compileOnly(project(":bootstrap"))
   compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
+  compileOnly("io.opentelemetry:opentelemetry-sdk-extension-declarative-config")
+  compileOnly("io.opentelemetry:opentelemetry-api-incubator")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-internal-logging-simple")
   compileOnly("com.google.auto.service:auto-service")
