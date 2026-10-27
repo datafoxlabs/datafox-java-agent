@@ -1,6 +1,6 @@
 # Datafox Java Agent 声明式配置兼容设计
 
-状态：实施中（`feat/declarative-config`）；运行时结论以本分支 GitHub Actions 为准。
+状态：已在 `feat/declarative-config` 实现；对应构建与运行验收通过，待 PR 审核合并。
 版本基线：OpenTelemetry Java Instrumentation / Splunk v2.32.0、OpenTelemetry Java SDK v1.66.0。
 
 ## 解决的问题
@@ -38,15 +38,27 @@
 
 | 验证 | 方法 | 当前状态 |
 |---|---|---|
-| Java 编译 / JUnit / Spotless | `./gradlew build` | 待本分支 CI |
-| 最终 Agent YAML OTLP Traces | `DeclarativeConfigAgentSmokeTest`，子 JVM + MockWebServer | 待本分支 CI |
-| Datafox Resource | YAML 导出中的 `telemetry.distro.name/version` | 待本分支 CI |
-| YAML 与传统属性隔离 | 同时传入冲突的传统 exporter 属性，确认按 YAML 导出 | 待本分支 CI |
-| Kafka Exporter | `KafkaAgentSmokeTest`，分别运行两种模式 | 待本分支 CI / Kafka Job |
-| ClassLoader / ServiceLoader | JAR 的 `inst/*.classdata` 与服务资源检查 | 待本分支 CI |
-| JDK / OS | Linux、Windows × JDK 8、11、17、21、25 | 待本分支 CI |
+| Java 编译 / JUnit / Spotless | `./gradlew build` | 已通过 CI |
+| 最终 Agent YAML OTLP Traces | `DeclarativeConfigAgentSmokeTest`，子 JVM + MockWebServer | 已通过 CI |
+| Datafox Resource | YAML 导出中的 `telemetry.distro.name/version` | 已通过 CI |
+| YAML 与传统属性隔离 | 同时传入冲突的传统 exporter 属性，确认按 YAML 导出 | 已通过 CI |
+| Kafka Exporter | `KafkaAgentSmokeTest`，分别运行两种模式 | 已通过 CI / Kafka Job |
+| ClassLoader / ServiceLoader | JAR 的 `inst/*.classdata` 与服务资源检查 | 已通过 CI |
+| JDK / OS | Linux、Windows × JDK 8、11、17、21、25 | 已通过 CI |
 | JDBC instrumentation 禁用 | 后续针对 JDBC 的应用级集成用例 | 尚未验证 |
 | 生产运行 / 动态更新 | 不在此次范围 | 尚未验证 |
+
+## 已执行的验证
+
+[GitHub Actions Run 40477725239](https://github.com/datafoxlabs/datafox-java-agent/actions/runs/40477725239) 在提交 `015aed3fe7e29d535444b1dd3b867f001ea75299` 上成功完成：
+
+- `./gradlew build`、格式检查、单元测试、Maven Local Publication 与 JAR ServiceLoader 检查。
+- 子 JVM YAML OTLP HTTP Smoke Test 验证真正加载最终 Agent，且 YAML 结果优先于冲突的传统 SDK Properties。
+- Docker Kafka 集成 Smoke Test 在 Java 8 上验证传统配置与 YAML，Consumer 收到 OTLP Protobuf。
+- Linux / Windows × JDK 8、11、17、21、25 的全部 10 组应用级 Smoke Test 成功。
+- 许可证报告、Release Bundle 与 CI 临时 GPG 签名检查成功；不表示已经生产签名或远程 Maven 发布。
+
+本次没有创建真实 JDBC Instrumentation 用例；`testLatestDeps` 和 Muzzle 当前没有 Datafox 专有 Instrumentation 目标。
 
 ## 设计取舍
 
