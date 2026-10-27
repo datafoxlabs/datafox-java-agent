@@ -26,8 +26,7 @@ import org.junit.jupiter.api.io.TempDir;
 class DeclarativeConfigAgentSmokeTest {
 
   @Test
-  void packagedAgentUsesYamlToExportSpanAndDatafoxResource(@TempDir Path tempDir)
-      throws Exception {
+  void packagedAgentUsesYamlToExportSpanAndDatafoxResource(@TempDir Path tempDir) throws Exception {
     String agentJar = System.getProperty("datafox.agent.jar");
     String classpath = System.getProperty("datafox.smoke.classpath");
     assertNotNull(agentJar);
@@ -54,7 +53,8 @@ class DeclarativeConfigAgentSmokeTest {
               + collector.url("/v1/traces")
               + "\n");
 
-      String javaHome = System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
+      String javaHome =
+          System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
       String java = Path.of(javaHome, "bin", "java").toString();
       Path output = tempDir.resolve("console.log");
       Path agentLog = tempDir.resolve("agent.log");
@@ -78,7 +78,8 @@ class DeclarativeConfigAgentSmokeTest {
         String log = Files.readString(output);
         assertEquals(0, process.exitValue(), log);
         assertTrue(Files.exists(agentLog), "Early Agent file logging must still work");
-        RecordedRequest request = collector.takeRequest(Duration.ofSeconds(10).toMillis(), TimeUnit.MILLISECONDS);
+        RecordedRequest request =
+            collector.takeRequest(Duration.ofSeconds(10).toMillis(), TimeUnit.MILLISECONDS);
         assertNotNull(request, "Declarative OTLP exporter did not send a request: " + log);
         assertEquals("/v1/traces", request.getPath());
         ExportTraceServiceRequest export =
