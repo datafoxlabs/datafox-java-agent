@@ -14,7 +14,7 @@ import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.internal.Resou
 import java.util.ArrayList;
 import java.util.List;
 
-/** Appends Datafox distribution metadata after upstream resource detectors. */
+/** Adds Datafox distribution metadata with the lowest detector precedence. */
 @AutoService(DeclarativeConfigurationCustomizerProvider.class)
 public final class DatafoxDistroResourceCustomizerProvider
     implements DeclarativeConfigurationCustomizerProvider {
@@ -50,7 +50,7 @@ public final class DatafoxDistroResourceCustomizerProvider
             detector
                 .getAdditionalProperties()
                 .put(DatafoxDistroResourceComponentProvider.NAME, null);
-            detectors.add(detector);
+            detectors.add(0, detector);
           }
           ResourceModelAccessor.setDetection(resource, detection);
           return model;
