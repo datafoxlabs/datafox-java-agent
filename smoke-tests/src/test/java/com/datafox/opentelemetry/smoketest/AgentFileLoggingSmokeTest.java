@@ -40,8 +40,7 @@ class AgentFileLoggingSmokeTest {
   void supportsAgentArguments(@TempDir Path tempDir) throws Exception {
     Path agentLog = tempDir.resolve("agent-argument.log");
 
-    runApplicationWithAgentArgs(
-        tempDir, "datafox.javaagent.logging.file=" + agentLog, null);
+    runApplicationWithAgentArgs(tempDir, "datafox.javaagent.logging.file=" + agentLog, null);
 
     assertTrue(Files.size(agentLog) > 0);
   }
@@ -77,14 +76,9 @@ class AgentFileLoggingSmokeTest {
     Path agentLog = tempDir.resolve("disabled.log");
     Path config = tempDir.resolve("otel.properties");
     Files.writeString(
-        config,
-        "otel.javaagent.logging=none\n"
-            + "datafox.javaagent.logging.file="
-            + agentLog
-            + "\n");
+        config, "otel.javaagent.logging=none\n" + "datafox.javaagent.logging.file=" + agentLog + "\n");
 
-    String console =
-        runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
+    String console = runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
 
     assertTrue(console.contains(APP_STDERR));
     assertFalse(Files.exists(agentLog));
