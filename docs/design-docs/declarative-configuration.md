@@ -21,18 +21,19 @@
 
 1. 传统 `KafkaSpanExporterProvider` 保持原有配置键；声明式 `KafkaSpanExporterComponentProvider` 使用 `bootstrap_servers`、`topic` 和可选 `producer`，两者复用 Kafka Exporter 构建方法。
 2. `DatafoxDistroResourceComponentProvider` 与传统 ResourceProvider 复用同一份 `telemetry.distro.*` 元数据，避免两种模式版本漂移。
-3. `DatafoxDistroResourceCustomizerProvider` 追加 Detector 到 YAML 模型，保留上游已有 Detector，并避免重复注入。直接在声明式 SDK Resource 管道构建，不额外建 SDK。
+3. `DatafoxDistroResourceCustomizerProvider` 将发行版 Detector 插入 YAML 模型的检测器列表头部（最低优先级），保留上游已有 Detector，避免重复注入；用户后续 Detector 可以覆盖同名属性。直接在声明式 SDK Resource 管道构建，不额外建 SDK。
 4. 独立 Agent 日志仍通过 `EarlyInitAgentConfig` 与现有 LoggingCustomizer 初始化，不把启动期设置混进 SDK YAML。
 5. 所有新 Agent 类随 `:custom` 经过 Shadow relocation / isolation；由 AutoService 生成对应 `META-INF/services` 项。
 
 ## 行为与限制
 
 - 使用 YAML 时，`otel.traces.exporter` 等传统 SDK properties 不自动覆盖 YAML Exporter。需要在 YAML 中明确指定 exporter、资源、处理器。
-- 当 `bootstrap_servers` 或 `topic` 为空时，Kafka Provider 应在创建 Producer 前失败。
+- 当 `bootstrap_servers` 或 `topic` 为空时，Kafka Provider 应在创建 Producer 前失败；显式配置的 `producer` 不是 YAML Mapping 时同样应失败，而不是忽略配置。
 - 此版本不支持 YAML 文件动态热更新，不引入 OpAMP 或 Profiler。
 - 不增加新的 Instrumentation；`jdbc` 声明式禁用需要独立集成用例才算完成行为验证。
 - `distribution.javaagent` 与 Resource 检测机制完全由上游负责；产品适配只使用上游 SPI。
-- Kafka `producer` 映射内容透传给 Kafka Producer，非法属性由 Kafka Clients 校验；不额外实现 Kafka 配置模型。
+- Kafka `producer` 映射内容透传给 Kafka Producer，非法 Kafka 属性由 Kafka Clients 校验；不额外实现 Kafka 配置模型。SDK 1.66.0 的 `DeclarativeConfigProperties.toMap()` 会对某些非字符串标量尝试多种类型读取，并记录冗余类型告警。示例建议将 Kafka Producer 参数写成字符串（例如 `linger.ms: "5"`），不在发行版中复制上游转换器。
+- Kafka 集成 Smoke Test 为传统和声明式模式分别设置不同 `service.name`，只将与当次运行 Resource 匹配的 Span 计为成功；YAML 模式同时覆盖 Producer Map 属性与 `bootstrap_servers` 的优先级。
 
 ## 验证矩阵
 
