@@ -8,6 +8,8 @@
 - [Datafox 评测与发行流程](release-and-evaluation.md) — 从 Gradle 构建到跨 JDK/OS Smoke Test、Release Bundle、校验和与草稿发行。
 - [Splunk 工程基础设施对齐清单](splunk-parity-checklist.md) — 记录 Gradle、Shadow、测试评测、CI 与发布体系的逐项差距。
 
+- [声明式配置兼容设计](declarative-configuration.md) — SDK / Agent 配置边界、Datafox Kafka/Resource 适配和验证矩阵。
+
 ## 文档约定
 
 - 明确状态、依据和未解决的问题。

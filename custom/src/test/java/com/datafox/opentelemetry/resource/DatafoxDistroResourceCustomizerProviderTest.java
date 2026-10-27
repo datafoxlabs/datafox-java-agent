@@ -12,8 +12,6 @@ import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.OpenTelemetryC
 import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.internal.ExperimentalResourceDetectionModel;
 import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.internal.ExperimentalResourceDetectorModel;
 import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.internal.ResourceModelAccessor;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DatafoxDistroResourceCustomizerProviderTest {

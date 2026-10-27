@@ -68,25 +68,46 @@ class KafkaAgentSmokeTest {
               consumerConfig, new StringDeserializer(), new ByteArrayDeserializer())) {
         consumer.subscribe(Collections.singletonList(TOPIC));
 
-        Path output = Files.createTempFile("datafox-kafka-agent-smoke", ".log");
-        try {
+        for (boolean declarative : new boolean[] {false, true}) {
+          Path output = Files.createTempFile("datafox-kafka-agent-smoke", ".log");
+          Path configFile = Files.createTempFile("datafox-kafka-agent-smoke", ".yaml");
+          try {
+            if (declarative) {
+              Files.writeString(
+                  configFile,
+                  "file_format: \"1.1\"\\n"
+                      + "tracer_provider:\\n"
+                      + "  processors:\\n"
+                      + "    - batch:\\n"
+                      + "        schedule_delay: 50\\n"
+                      + "        exporter:\\n"
+                      + "          kafka:\\n"
+                      + "            bootstrap_servers: " + kafka.getBootstrapServers() + "\\n"
+                      + "            topic: " + TOPIC + "\\n");
+            }
           String javaHome =
               System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
           String java = Path.of(javaHome, "bin", "java").toString();
+          java.util.List<String> command = new java.util.ArrayList<>();
+          command.add(java);
+          command.add("-javaagent:" + agentJar);
+          if (declarative) {
+            command.add("-Dotel.config.file=" + configFile);
+            command.add("-Dotel.traces.exporter=none");
+          } else {
+            command.add("-Dotel.traces.exporter=kafka");
+            command.add("-Dotel.metrics.exporter=none");
+            command.add("-Dotel.logs.exporter=none");
+            command.add("-Dotel.bsp.schedule.delay=50");
+            command.add("-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers());
+            command.add("-Ddatafox.exporter.kafka.topic=" + TOPIC);
+          }
+          command.add("-Dotel.service.name=datafox-kafka-smoke");
+          command.add("-cp");
+          command.add(classpath);
+          command.add(SmokeApplication.class.getName());
           Process process =
-              new ProcessBuilder(
-                      java,
-                      "-javaagent:" + agentJar,
-                      "-Dotel.traces.exporter=kafka",
-                      "-Dotel.metrics.exporter=none",
-                      "-Dotel.logs.exporter=none",
-                      "-Dotel.bsp.schedule.delay=50",
-                      "-Dotel.service.name=datafox-kafka-smoke",
-                      "-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers(),
-                      "-Ddatafox.exporter.kafka.topic=" + TOPIC,
-                      "-cp",
-                      classpath,
-                      SmokeApplication.class.getName())
+              new ProcessBuilder(command)
                   .redirectErrorStream(true)
                   .redirectOutput(output.toFile())
                   .start();

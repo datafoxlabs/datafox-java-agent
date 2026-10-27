@@ -20,6 +20,46 @@
 
 Splunk 的 OpAMP、Profiler、No-code、专有应用服务器 Instrumentation 等产品功能不在基础设施对齐范围；有 Datafox 需求时再单独引入。
 
+## 声明式 YAML 配置
+
+基于 OpenTelemetry Java Agent 2.32.0 和 SDK 1.66.0 的实验性声明式配置，通过 `-Dotel.config.file=/etc/datafox/otel-config.yaml` 启用。声明式 SDK 初始化与传统 `otel.*` properties 自动配置是不同路径；不能将全部 JVM properties 视为 YAML 的自动覆盖项。Agent 自身文件日志仍使用 `datafox.javaagent.logging.file` 早期配置。
+
+OTLP HTTP 与 Datafox Kafka Exporter 的示例配置：
+
+```yaml
+file_format: "1.1"
+resource:
+  attributes:
+    - name: service.name
+      value: order-service
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+```
+
+Kafka 使用 Datafox 的声明式 `ComponentProvider`（并非 OpenTelemetry 内置 Exporter）：
+
+```yaml
+file_format: "1.1"
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          kafka:
+            bootstrap_servers: localhost:9092
+            topic: otel-traces
+            producer:
+              acks: all
+              linger.ms: 5
+```
+
+需要同时满足 `bootstrap_servers` 和 `topic`，缺失时报配置错误；`bootstrap_servers` 优先于 `producer.bootstrap.servers`。自定义 Resource 元数据由发行版声明式 Resource Detector 注入。YAML 模式与传统模式的 SDK 扩展接口分别注册，不能自动互换。
+
+具体实现及验证边界见 [声明式配置兼容设计](docs/design-docs/declarative-configuration.md)。
+
 ## Agent 自身诊断日志文件
 
 发行版可以把 **Agent 内部诊断日志** 输出到独立文件，不重定向整个 JVM 的 `System.err`，也不改变应用的 Logback / Log4j2 或 OTLP Logs SDK。默认不启用，沿用 OpenTelemetry 的 `simple`（stderr）、`application`、`none`。
