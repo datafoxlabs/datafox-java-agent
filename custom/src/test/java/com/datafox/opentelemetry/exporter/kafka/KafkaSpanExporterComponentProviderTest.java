@@ -15,6 +15,7 @@ import io.opentelemetry.api.incubator.config.DeclarativeConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigurationException;
 import io.opentelemetry.sdk.autoconfigure.spi.internal.ComponentProvider;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import java.util.Collections;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,20 @@ class KafkaSpanExporterComponentProviderTest {
     assertThrows(
         ConfigurationException.class,
         () -> new KafkaSpanExporterComponentProvider().create(config));
+  }
+
+  @Test
+  void rejectsProducerWhenItIsNotAMapping() {
+    DeclarativeConfigProperties config = mock(DeclarativeConfigProperties.class);
+    when(config.getPropertyKeys()).thenReturn(Collections.singleton("producer"));
+    when(config.getString("bootstrap_servers")).thenReturn("localhost:9092");
+    when(config.getString("topic")).thenReturn("traces");
+
+    ConfigurationException exception =
+        assertThrows(
+            ConfigurationException.class,
+            () -> new KafkaSpanExporterComponentProvider().create(config));
+    assertEquals("kafka.producer must be a mapping", exception.getMessage());
   }
 
   @Test
