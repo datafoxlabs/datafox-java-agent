@@ -64,7 +64,8 @@ class AgentFileLoggingSmokeTest {
   void readsFilePathFromAgentConfigurationFile(@TempDir Path tempDir) throws Exception {
     Path agentLog = tempDir.resolve("configuration.log");
     Path config = tempDir.resolve("otel.properties");
-    Files.writeString(config, "datafox.javaagent.logging.file=" + agentLog + "\n");
+    Files.writeString(
+        config, "datafox.javaagent.logging.file=" + agentLog.toString().replace('\\', '/') + "\n");
 
     runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
 
