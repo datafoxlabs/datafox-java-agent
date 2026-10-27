@@ -103,7 +103,8 @@ class KafkaAgentSmokeTest {
               command.add("-Dotel.metrics.exporter=none");
               command.add("-Dotel.logs.exporter=none");
               command.add("-Dotel.bsp.schedule.delay=50");
-              command.add("-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers());
+              command.add(
+                  "-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers());
               command.add("-Ddatafox.exporter.kafka.topic=" + TOPIC);
             }
             command.add("-Dotel.service.name=datafox-kafka-smoke");
@@ -140,7 +141,10 @@ class KafkaAgentSmokeTest {
             }
             assertTrue(
                 foundSpan,
-                "No OTLP span arrived via Kafka. Declarative=" + declarative + " Agent output:\n" + log);
+                "No OTLP span arrived via Kafka. Declarative="
+                    + declarative
+                    + " Agent output:\n"
+                    + log);
           } finally {
             Files.deleteIfExists(output);
             Files.deleteIfExists(configFile);
