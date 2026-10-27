@@ -47,7 +47,9 @@ public final class DatafoxDistroResourceCustomizerProvider
                               .containsKey(DatafoxDistroResourceComponentProvider.NAME));
           if (!present) {
             ExperimentalResourceDetectorModel detector = new ExperimentalResourceDetectorModel();
-            detector.getAdditionalProperties().put(DatafoxDistroResourceComponentProvider.NAME, null);
+            detector
+                .getAdditionalProperties()
+                .put(DatafoxDistroResourceComponentProvider.NAME, null);
             detectors.add(detector);
           }
           ResourceModelAccessor.setDetection(resource, detection);
