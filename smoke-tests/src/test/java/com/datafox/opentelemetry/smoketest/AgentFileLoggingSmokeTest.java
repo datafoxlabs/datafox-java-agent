@@ -76,7 +76,8 @@ class AgentFileLoggingSmokeTest {
     Path agentLog = tempDir.resolve("disabled.log");
     Path config = tempDir.resolve("otel.properties");
     Files.writeString(
-        config, "otel.javaagent.logging=none\n" + "datafox.javaagent.logging.file=" + agentLog + "\n");
+        config,
+        "otel.javaagent.logging=none\n" + "datafox.javaagent.logging.file=" + agentLog + "\n");
 
     String console = runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
 
