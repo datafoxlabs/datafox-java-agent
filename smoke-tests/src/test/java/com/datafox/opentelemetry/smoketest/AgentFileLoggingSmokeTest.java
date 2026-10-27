@@ -29,8 +29,7 @@ class AgentFileLoggingSmokeTest {
       throws Exception {
     Path agentLog = tempDir.resolve("agent.log");
 
-    String console =
-        runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file=" + agentLog);
+    String console = runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file=" + agentLog);
 
     assertTrue(console.contains(APP_STDERR));
     assertTrue(Files.size(agentLog) > 0, "Agent should write diagnostic logs to its file");
@@ -78,11 +77,31 @@ class AgentFileLoggingSmokeTest {
 
   @Test
   void reportsBlankLogFileAndKeepsUpstreamLogging(@TempDir Path tempDir) throws Exception {
-    String console =
-        runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file= ");
+    String console = runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file= ");
 
     assertTrue(console.contains("Invalid datafox.javaagent.logging.file"));
     assertTrue(console.contains(APP_STDERR));
+  }
+
+  @Test
+  void truncatesAnExistingAgentLogFile(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("existing.log");
+    Files.writeString(agentLog, "old-agent-log-marker");
+
+    runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file=" + agentLog);
+
+    assertTrue(Files.size(agentLog) > 0);
+    assertFalse(Files.readString(agentLog).contains("old-agent-log-marker"));
+  }
+
+  @Test
+  void fallsBackToStderrWhenTheFileCannotBeOpened(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("missing").resolve("agent.log");
+
+    String console = runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file=" + agentLog);
+
+    assertTrue(console.contains(APP_STDERR));
+    assertFalse(Files.exists(agentLog));
   }
 
   private static String runApplication(Path tempDir, Path environmentLogFile, String... args)
