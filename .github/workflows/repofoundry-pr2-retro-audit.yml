@@ -1,0 +1,131 @@
+name: RepoFoundry retrospective audit for merged PR 2
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/repofoundry-pr2-retro-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  spec-activation-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run pinned RepoFoundry Spec activation and non-vacuous diff audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=c65aa25eef0bba37b0d5448cf6eacd90184fd32f
+          TARGET=59b4515a3c75e7f47729697dfbf76df71a06ae11
+          OUTPUT="$RUNNER_TEMP/repofoundry-spec-audit"
+          mkdir -p "$OUTPUT"
+          git cat-file -e "$BASE^{commit}"
+          git cat-file -e "$TARGET^{commit}"
+          git diff --name-only --no-renames "$BASE" "$TARGET" > "$OUTPUT/expected-paths.txt"
+          test "$(wc -l < "$OUTPUT/expected-paths.txt")" -eq 6
+          git -c advice.detachedHead=false checkout --detach "$BASE"
+
+          router() {
+            python3 .repo-foundry/engineering-specs/spec_router.py "$@"
+          }
+          router begin --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation \
+            --prompt "Post-merge Spec activation audit for PR 2 diagnostic Agent file logging" > "$OUTPUT/begin.json"
+          router classify --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation \
+            --mode governed --reason "Post-merge review of published Datafox configuration and Agent logging failure behavior" > "$OUTPUT/classification.json"
+
+          router candidates \
+            --path README.md \
+            --path custom/build.gradle.kts \
+            --path custom/src/main/java/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.java \
+            --path smoke-tests/src/main/java/com/datafox/opentelemetry/smoketest/LoggingSmokeApplication.java \
+            --path smoke-tests/src/test/java/com/datafox/opentelemetry/smoketest/AgentFileLoggingSmokeTest.java \
+            --path .github/workflows/agent-build.yml > "$OUTPUT/candidates.json"
+
+          router requirements --path custom/src/main/java/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.java \
+            --spec core/implementation-simplicity > "$OUTPUT/requirements-simplicity.json"
+          router requirements --path custom/src/main/java/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.java \
+            --spec core/data-boundaries > "$OUTPUT/requirements-boundaries.json"
+          router requirements --path custom/src/main/java/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.java \
+            --spec core/semantic-naming > "$OUTPUT/requirements-naming.json"
+
+          router activate --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation \
+            --path README.md \
+            --path custom/build.gradle.kts \
+            --path custom/src/main/java/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.java \
+            --path smoke-tests/src/main/java/com/datafox/opentelemetry/smoketest/LoggingSmokeApplication.java \
+            --path smoke-tests/src/test/java/com/datafox/opentelemetry/smoketest/AgentFileLoggingSmokeTest.java \
+            --path .github/workflows/agent-build.yml \
+            --spec core/implementation-simplicity \
+            --spec core/data-boundaries \
+            --spec core/semantic-naming \
+            --requirement SIM-CHANGE-001 \
+            --requirement SIM-ORDER-001 \
+            --requirement DATA-EFFECT-001 \
+            --requirement DATA-ERROR-001 \
+            --requirement SEM-SURFACE-001 \
+            --because "SIM-CHANGE-001=Check minimal distribution-only logging changes and preserve upstream implementations" \
+            --because "SIM-ORDER-001=Ensure Agent arguments and early configuration resolve before SimpleLogger initialization" \
+            --because "DATA-EFFECT-001=Ensure invalid file configuration is rejected before a file output side effect" \
+            --because "DATA-ERROR-001=Check blank path and unavailable file reporting without exposing secrets" \
+            --because "SEM-SURFACE-001=Verify published property environment variable and SimpleLogger property mapping" \
+            > "$OUTPUT/activation.json"
+          router status --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation \
+            > "$OUTPUT/status.json"
+
+          cat > "$OUTPUT/handoff.txt" <<'HANDOFF'
+          Activated specifications: core/implementation-simplicity; core/data-boundaries; core/semantic-naming.
+          Activated requirements: SIM-CHANGE-001, SIM-ORDER-001, DATA-EFFECT-001, DATA-ERROR-001, SEM-SURFACE-001 plus verified dependency closure.
+          Verification: Pinned c65aa25eef0bba37b0d5448cf6eacd90184fd32f..59b4515a3c75e7f47729697dfbf76df71a06ae11 six-file diff, RepoFoundry native activation receipt and audit. Original Java/Windows/Linux test evidence: GitHub Actions 40451097734.
+          Exceptions: This is post-merge retrospective activation. It is not pre-implementation approval; Specs remain advisory and this router does not adjudicate code correctness.
+          Compatibility or migration: Existing OpenTelemetry and Splunk runtime and packaging invariants apply; no additional runtime changes in this audit.
+          HANDOFF
+
+          git -c advice.detachedHead=false checkout --detach "$TARGET"
+          router evidence --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation > "$OUTPUT/evidence.json"
+          router audit --adapter-id portable --session-id pr2-postmerge-20261027 --turn-id retrospective-spec-activation \
+            --message-file "$OUTPUT/handoff.txt" > "$OUTPUT/audit.json"
+
+          python3 - "$OUTPUT" "$TARGET" <<'PY'
+          import json
+          import pathlib
+          import sys
+          directory = pathlib.Path(sys.argv[1])
+          target = sys.argv[2]
+          expected = sorted(directory.joinpath("expected-paths.txt").read_text().splitlines())
+          audit = json.loads(directory.joinpath("audit.json").read_text())
+          evidence = json.loads(directory.joinpath("evidence.json").read_text())
+          activation = json.loads(directory.joinpath("activation.json").read_text())
+          assert len(expected) == 6, expected
+          assert audit["ok"] is True, audit
+          assert audit["changed_paths"] == expected, (audit["changed_paths"], expected)
+          assert audit["uncovered_paths"] == [], audit
+          assert audit["missing_handoff_labels"] == [], audit
+          assert audit["governance_mode"] == "governed", audit
+          assert evidence["consumer"]["repository_head"] == target, evidence["consumer"]
+          assert evidence["consumer"]["worktree_clean"] is True, evidence["consumer"]
+          assert evidence["receipt"]["decision"] == "activated", evidence["receipt"]
+          assert len(evidence["requirements"]) >= 5, evidence["requirements"]
+          print(json.dumps({
+            "target_commit": target,
+            "retrospective": True,
+            "audit_ok": audit["ok"],
+            "changed_paths": audit["changed_paths"],
+            "uncovered_paths": audit["uncovered_paths"],
+            "governance_mode": audit["governance_mode"],
+            "activated_specs": [item["id"] for item in activation["activated_specs"]],
+            "resolved_requirements": [item["id"] for item in evidence["requirements"]],
+            "receipt_sha256": evidence["sha256"]
+          }, ensure_ascii=False, indent=2))
+          PY
+      - name: Upload RepoFoundry activation receipt and audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repofoundry-pr2-postmerge-activation-audit
+          path: ${{ runner.temp }}/repofoundry-spec-audit/
+          if-no-files-found: warn
