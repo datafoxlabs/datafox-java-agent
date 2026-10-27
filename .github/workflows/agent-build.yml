@@ -86,6 +86,8 @@ jobs:
           jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/exporter/kafka/KafkaSpanExporterProvider.classdata'
           jar tf "$AGENT" | grep -F 'inst/com/datafox/contrib/kafka/KafkaSpanExporter.classdata'
           unzip -p "$AGENT" inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.traces.ConfigurableSpanExporterProvider | grep -F 'KafkaSpanExporterProvider'
+          jar tf "$AGENT" | grep -F 'inst/com/datafox/opentelemetry/logging/DatafoxSimpleLoggingCustomizer.classdata'
+          unzip -p "$AGENT" inst/META-INF/services/io.opentelemetry.javaagent.tooling.LoggingCustomizer | grep -Fx 'com.datafox.opentelemetry.logging.DatafoxSimpleLoggingCustomizer'
           unzip -p "$AGENT" inst/datafox.properties | grep -Fx 'telemetry.distro.version=0.1.0-SNAPSHOT'
           unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Premain-Class: com.datafox.opentelemetry.javaagent.DatafoxAgent'
           unzip -p "$AGENT" META-INF/MANIFEST.MF | grep -F 'Implementation-Version: datafox-0.1.0-SNAPSHOT-otel-2.32.0'
