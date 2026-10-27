@@ -82,61 +82,65 @@ class KafkaAgentSmokeTest {
                       + "        schedule_delay: 50\n"
                       + "        exporter:\n"
                       + "          kafka:\n"
-                      + "            bootstrap_servers: " + kafka.getBootstrapServers() + "\n"
-                      + "            topic: " + TOPIC + "\n");
+                      + "            bootstrap_servers: "
+                      + kafka.getBootstrapServers()
+                      + "\n"
+                      + "            topic: "
+                      + TOPIC
+                      + "\n");
             }
-          String javaHome =
-              System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
-          String java = Path.of(javaHome, "bin", "java").toString();
-          java.util.List<String> command = new java.util.ArrayList<>();
-          command.add(java);
-          command.add("-javaagent:" + agentJar);
-          if (declarative) {
-            command.add("-Dotel.config.file=" + configFile);
-            command.add("-Dotel.traces.exporter=none");
-          } else {
-            command.add("-Dotel.traces.exporter=kafka");
-            command.add("-Dotel.metrics.exporter=none");
-            command.add("-Dotel.logs.exporter=none");
-            command.add("-Dotel.bsp.schedule.delay=50");
-            command.add("-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers());
-            command.add("-Ddatafox.exporter.kafka.topic=" + TOPIC);
-          }
-          command.add("-Dotel.service.name=datafox-kafka-smoke");
-          command.add("-cp");
-          command.add(classpath);
-          command.add(SmokeApplication.class.getName());
-          Process process =
-              new ProcessBuilder(command)
-                  .redirectErrorStream(true)
-                  .redirectOutput(output.toFile())
-                  .start();
+            String javaHome =
+                System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
+            String java = Path.of(javaHome, "bin", "java").toString();
+            java.util.List<String> command = new java.util.ArrayList<>();
+            command.add(java);
+            command.add("-javaagent:" + agentJar);
+            if (declarative) {
+              command.add("-Dotel.config.file=" + configFile);
+              command.add("-Dotel.traces.exporter=none");
+            } else {
+              command.add("-Dotel.traces.exporter=kafka");
+              command.add("-Dotel.metrics.exporter=none");
+              command.add("-Dotel.logs.exporter=none");
+              command.add("-Dotel.bsp.schedule.delay=50");
+              command.add("-Ddatafox.exporter.kafka.bootstrap-servers=" + kafka.getBootstrapServers());
+              command.add("-Ddatafox.exporter.kafka.topic=" + TOPIC);
+            }
+            command.add("-Dotel.service.name=datafox-kafka-smoke");
+            command.add("-cp");
+            command.add(classpath);
+            command.add(SmokeApplication.class.getName());
+            Process process =
+                new ProcessBuilder(command)
+                    .redirectErrorStream(true)
+                    .redirectOutput(output.toFile())
+                    .start();
 
-          assertTrue(process.waitFor(40, TimeUnit.SECONDS), "Smoke application did not exit");
-          String log = Files.readString(output);
-          assertEquals(0, process.exitValue(), log);
+            assertTrue(process.waitFor(40, TimeUnit.SECONDS), "Smoke application did not exit");
+            String log = Files.readString(output);
+            assertEquals(0, process.exitValue(), log);
 
-          boolean foundSpan = false;
-          long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(25);
-          while (System.nanoTime() < deadline && !foundSpan) {
-            ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(500));
-            for (ConsumerRecord<String, byte[]> record : records) {
-              ExportTraceServiceRequest request =
-                  ExportTraceServiceRequest.parseFrom(record.value());
-              for (ResourceSpans resource : request.getResourceSpansList()) {
-                for (ScopeSpans scope : resource.getScopeSpansList()) {
-                  for (Span span : scope.getSpansList()) {
-                    if ("datafox-smoke-span".equals(span.getName())) {
-                      foundSpan = true;
+            boolean foundSpan = false;
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(25);
+            while (System.nanoTime() < deadline && !foundSpan) {
+              ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(500));
+              for (ConsumerRecord<String, byte[]> record : records) {
+                ExportTraceServiceRequest request =
+                    ExportTraceServiceRequest.parseFrom(record.value());
+                for (ResourceSpans resource : request.getResourceSpansList()) {
+                  for (ScopeSpans scope : resource.getScopeSpansList()) {
+                    for (Span span : scope.getSpansList()) {
+                      if ("datafox-smoke-span".equals(span.getName())) {
+                        foundSpan = true;
+                      }
                     }
                   }
                 }
               }
             }
-          }
-          assertTrue(
-              foundSpan,
-              "No OTLP span arrived via Kafka. Declarative=" + declarative + " Agent output:\n" + log);
+            assertTrue(
+                foundSpan,
+                "No OTLP span arrived via Kafka. Declarative=" + declarative + " Agent output:\n" + log);
           } finally {
             Files.deleteIfExists(output);
             Files.deleteIfExists(configFile);
