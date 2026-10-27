@@ -20,6 +20,30 @@
 
 Splunk 的 OpAMP、Profiler、No-code、专有应用服务器 Instrumentation 等产品功能不在基础设施对齐范围；有 Datafox 需求时再单独引入。
 
+## Agent 自身诊断日志文件
+
+发行版可以把 **Agent 内部诊断日志** 输出到独立文件，不重定向整个 JVM 的 `System.err`，也不改变应用的 Logback / Log4j2 或 OTLP Logs SDK。默认不启用，沿用 OpenTelemetry 的 `simple`（stderr）、`application`、`none`。
+
+```bash
+java \
+  -javaagent:datafox-javaagent.jar \
+  -Ddatafox.javaagent.logging.file=/var/log/datafox/agent.log \
+  -jar application.jar
+```
+
+也支持环境变量 `DATAFOX_JAVAAGENT_LOGGING_FILE`；**JVM 系统属性优先于环境变量**。这个配置在发行版 Bootstrap 阶段读取，不支持放在 `otel.javaagent.configuration-file` 指定的配置文件中。
+
+实现上复用上游已重定位的 SLF4J SimpleLogger。具体行为：
+
+- 仅在 `otel.javaagent.logging` 未设置或为 `simple` 时生效；显式选择 `application` / `none` 时保持上游行为，忽略文件路径。
+- 若已直接设置上游 `io.opentelemetry.javaagent.slf4j.simpleLogger.logFile` 系统属性，则该上游属性优先，发行版不覆盖它。
+- `otel.javaagent.debug=true` 继续控制 Agent DEBUG 日志。
+- 文件父目录必须事先存在。SimpleLogger 打开文件失败时会报告错误并回退 stderr；空白路径由发行版报告错误并保持默认输出。
+- **SimpleLogger 每次 JVM 启动时截断文件**，不追加；不提供文件轮转。外部轮转需考虑进程持有的文件描述符，`copytruncate` 存在丢日志窗口。
+- 上游 Agent 初始化日志后通过内部 Logger 打印的内容写入文件。Bootstrap 早期、JVM 本身以及上游直接使用 `System.err` 的输出不保证进入这个文件。
+
+这是 Agent 自身诊断日志功能，与 Logback / Log4j2 应用日志注入和 `otel.logs.exporter` 无关。
+
 ## Kafka Trace Exporter
 
 Datafox Java Agent 通过官方 `ConfigurableSpanExporterProvider` 提供 `kafka` 选项，直接复用 [DataFox Java Contrib Kafka Exporter](https://github.com/datafoxlabs/datafox-java-contrib/tree/main/kafka-exporter)。例如：
