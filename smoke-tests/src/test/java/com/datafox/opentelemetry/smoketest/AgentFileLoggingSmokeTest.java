@@ -37,6 +37,60 @@ class AgentFileLoggingSmokeTest {
   }
 
   @Test
+  void supportsAgentArguments(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("agent-argument.log");
+
+    runApplicationWithAgentArgs(
+        tempDir, "datafox.javaagent.logging.file=" + agentLog, null);
+
+    assertTrue(Files.size(agentLog) > 0);
+  }
+
+  @Test
+  void agentArgumentsOverrideJvmProperties(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("agent-argument.log");
+    Path systemLog = tempDir.resolve("system-property.log");
+
+    runApplicationWithAgentArgs(
+        tempDir,
+        "datafox.javaagent.logging.file=" + agentLog,
+        null,
+        "-Ddatafox.javaagent.logging.file=" + systemLog);
+
+    assertTrue(Files.size(agentLog) > 0);
+    assertFalse(Files.exists(systemLog));
+  }
+
+  @Test
+  void readsFilePathFromAgentConfigurationFile(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("configuration.log");
+    Path config = tempDir.resolve("otel.properties");
+    Files.writeString(config, "datafox.javaagent.logging.file=" + agentLog + "\n");
+
+    runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
+
+    assertTrue(Files.size(agentLog) > 0);
+  }
+
+  @Test
+  void respectsLoggingModeFromAgentConfigurationFile(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("disabled.log");
+    Path config = tempDir.resolve("otel.properties");
+    Files.writeString(
+        config,
+        "otel.javaagent.logging=none\n"
+            + "datafox.javaagent.logging.file="
+            + agentLog
+            + "\n");
+
+    String console =
+        runApplication(tempDir, null, "-Dotel.javaagent.configuration-file=" + config);
+
+    assertTrue(console.contains(APP_STDERR));
+    assertFalse(Files.exists(agentLog));
+  }
+
+  @Test
   void preservesAnExplicitUpstreamSimpleLoggerFile(@TempDir Path tempDir) throws Exception {
     Path requested = tempDir.resolve("requested.log");
     Path upstream = tempDir.resolve("upstream.log");
@@ -67,6 +121,21 @@ class AgentFileLoggingSmokeTest {
   }
 
   @Test
+  void respectsApplicationLoggingMode(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("application.log");
+
+    String console =
+        runApplication(
+            tempDir,
+            null,
+            "-Ddatafox.javaagent.logging.file=" + agentLog,
+            "-Dotel.javaagent.logging=application");
+
+    assertTrue(console.contains(APP_STDERR));
+    assertFalse(Files.exists(agentLog));
+  }
+
+  @Test
   void acceptsEnvironmentVariableForAgentLogFile(@TempDir Path tempDir) throws Exception {
     Path agentLog = tempDir.resolve("environment.log");
 
@@ -76,11 +145,35 @@ class AgentFileLoggingSmokeTest {
   }
 
   @Test
+  void systemPropertyOverridesEnvironmentVariable(@TempDir Path tempDir) throws Exception {
+    Path environment = tempDir.resolve("environment.log");
+    Path system = tempDir.resolve("system.log");
+
+    runApplication(tempDir, environment, "-Ddatafox.javaagent.logging.file=" + system);
+
+    assertTrue(Files.size(system) > 0);
+    assertFalse(Files.exists(environment));
+  }
+
+  @Test
   void reportsBlankLogFileAndKeepsUpstreamLogging(@TempDir Path tempDir) throws Exception {
     String console = runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file= ");
 
     assertTrue(console.contains("Invalid datafox.javaagent.logging.file"));
     assertTrue(console.contains(APP_STDERR));
+  }
+
+  @Test
+  void initializesFileWithoutDebugLogging(@TempDir Path tempDir) throws Exception {
+    Path agentLog = tempDir.resolve("default.log");
+
+    runApplication(
+        tempDir,
+        null,
+        "-Ddatafox.javaagent.logging.file=" + agentLog,
+        "-Dotel.javaagent.debug=false");
+
+    assertTrue(Files.exists(agentLog), "SimpleLogger should open its file in normal mode");
   }
 
   @Test
@@ -100,11 +193,19 @@ class AgentFileLoggingSmokeTest {
 
     String console = runApplication(tempDir, null, "-Ddatafox.javaagent.logging.file=" + agentLog);
 
-    assertTrue(console.contains(APP_STDERR));
+    assertTrue(console.contains("Could not open ["), "SimpleLogger must report the file error");
+    assertTrue(console.contains("Defaulting to System.err"));
+    assertTrue(console.contains("[otel.javaagent "), "Agent logs must fall back to stderr");
     assertFalse(Files.exists(agentLog));
   }
 
   private static String runApplication(Path tempDir, Path environmentLogFile, String... args)
+      throws IOException, InterruptedException {
+    return runApplicationWithAgentArgs(tempDir, null, environmentLogFile, args);
+  }
+
+  private static String runApplicationWithAgentArgs(
+      Path tempDir, String agentArgs, Path environmentLogFile, String... args)
       throws IOException, InterruptedException {
     String javaHome = System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
     String java = Path.of(javaHome, "bin", "java").toString();
@@ -113,7 +214,7 @@ class AgentFileLoggingSmokeTest {
 
     List<String> command = new ArrayList<>();
     command.add(java);
-    command.add("-javaagent:" + agentJar);
+    command.add("-javaagent:" + agentJar + (agentArgs == null ? "" : "=" + agentArgs));
     command.add("-Dotel.javaagent.debug=true");
     command.add("-Dotel.traces.exporter=none");
     command.add("-Dotel.metrics.exporter=none");

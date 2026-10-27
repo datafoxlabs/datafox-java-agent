@@ -8,7 +8,7 @@
 |---|---|
 | `:agent` | 组装发行版 JAR、Maven 主制品、Sources/Javadoc 和可选签名 |
 | `:bootstrap` | Splunk 风格的薄启动委托，最终调用上游 Agent |
-| `:custom` | 发行版 SDK/SPI 定制：Resource 元数据与 Kafka Span Exporter 自动配置 |
+| `:custom` | 发行版 SDK/SPI 定制：Resource、Kafka Span Exporter 与 Agent Logger |
 | `:dependencyManagement` | 统一 SDK、Instrumentation、Agent、测试依赖版本 |
 | `:instrumentation` | 专有 Instrumentation 的聚合与 Muzzle 发现入口 |
 | `:smoke-tests` | 启动子 JVM，通过最终 Agent JAR 验证 OTLP HTTP 导出 |
@@ -31,9 +31,9 @@ java \
   -jar application.jar
 ```
 
-也支持环境变量 `DATAFOX_JAVAAGENT_LOGGING_FILE`；**JVM 系统属性优先于环境变量**。这个配置在发行版 Bootstrap 阶段读取，不支持放在 `otel.javaagent.configuration-file` 指定的配置文件中。
+还支持环境变量 `DATAFOX_JAVAAGENT_LOGGING_FILE`、Agent 参数 `-javaagent:agent.jar=datafox.javaagent.logging.file=/path/agent.log`，以及 `otel.javaagent.configuration-file` 指定的 Properties 文件。上游 `AgentInitializer` 先解析 Agent 参数，再由发行版 `LoggingCustomizer` 读取配置；取值顺序为 Agent 参数覆盖后的 JVM 系统属性、环境变量、配置文件。
 
-实现上复用上游已重定位的 SLF4J SimpleLogger。具体行为：
+实现上在 `:custom` 中采用 Splunk 风格的 `LoggingCustomizer`，委托上游已重定位的 SLF4J SimpleLogger；`:bootstrap` 保持薄启动委托。具体行为：
 
 - 仅在 `otel.javaagent.logging` 未设置或为 `simple` 时生效；显式选择 `application` / `none` 时保持上游行为，忽略文件路径。
 - 若已直接设置上游 `io.opentelemetry.javaagent.slf4j.simpleLogger.logFile` 系统属性，则该上游属性优先，发行版不覆盖它。
