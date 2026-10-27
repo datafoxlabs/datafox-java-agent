@@ -75,15 +75,15 @@ class KafkaAgentSmokeTest {
             if (declarative) {
               Files.writeString(
                   configFile,
-                  "file_format: \"1.1\"\\n"
-                      + "tracer_provider:\\n"
-                      + "  processors:\\n"
-                      + "    - batch:\\n"
-                      + "        schedule_delay: 50\\n"
-                      + "        exporter:\\n"
-                      + "          kafka:\\n"
-                      + "            bootstrap_servers: " + kafka.getBootstrapServers() + "\\n"
-                      + "            topic: " + TOPIC + "\\n");
+                  "file_format: \"1.1\"\n"
+                      + "tracer_provider:\n"
+                      + "  processors:\n"
+                      + "    - batch:\n"
+                      + "        schedule_delay: 50\n"
+                      + "        exporter:\n"
+                      + "          kafka:\n"
+                      + "            bootstrap_servers: " + kafka.getBootstrapServers() + "\n"
+                      + "            topic: " + TOPIC + "\n");
             }
           String javaHome =
               System.getProperty("datafox.smoke.javaHome", System.getProperty("java.home"));
@@ -134,9 +134,13 @@ class KafkaAgentSmokeTest {
               }
             }
           }
-          assertTrue(foundSpan, "No OTLP span arrived via Kafka. Agent output:\n" + log);
-        } finally {
-          Files.deleteIfExists(output);
+          assertTrue(
+              foundSpan,
+              "No OTLP span arrived via Kafka. Declarative=" + declarative + " Agent output:\n" + log);
+          } finally {
+            Files.deleteIfExists(output);
+            Files.deleteIfExists(configFile);
+          }
         }
       }
     }
