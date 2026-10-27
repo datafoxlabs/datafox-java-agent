@@ -53,10 +53,10 @@ tracer_provider:
             topic: otel-traces
             producer:
               acks: all
-              linger.ms: 5
+              linger.ms: "5"
 ```
 
-需要同时满足 `bootstrap_servers` 和 `topic`，缺失时报配置错误；`bootstrap_servers` 优先于 `producer.bootstrap.servers`。自定义 Resource 元数据由发行版声明式 Resource Detector 注入。YAML 模式与传统模式的 SDK 扩展接口分别注册，不能自动互换。
+需要同时满足 `bootstrap_servers` 和 `topic`，缺失时报配置错误；`producer` 必须是 YAML Mapping，错误类型直接报配置错误。`bootstrap_servers` 优先于 `producer.bootstrap.servers`。SDK 1.66.0 将声明式属性转换为 Map 时会对非字符串标量产生额外类型告警，因此 Kafka Producer 参数建议写成字符串（如 `linger.ms: "5"`），由 Kafka Clients 解析。自定义 Resource 元数据由发行版声明式 Resource Detector 注入。YAML 模式与传统模式的 SDK 扩展接口分别注册，不能自动互换。
 
 具体实现及验证边界见 [声明式配置兼容设计](docs/design-docs/declarative-configuration.md)。
 
