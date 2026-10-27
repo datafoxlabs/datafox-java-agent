@@ -40,7 +40,8 @@ class KafkaSpanExporterComponentProviderTest {
     DeclarativeConfigProperties config = mock(DeclarativeConfigProperties.class);
     when(config.getString("topic")).thenReturn("traces");
     assertThrows(
-        ConfigurationException.class, () -> new KafkaSpanExporterComponentProvider().create(config));
+        ConfigurationException.class,
+        () -> new KafkaSpanExporterComponentProvider().create(config));
   }
 
   @Test

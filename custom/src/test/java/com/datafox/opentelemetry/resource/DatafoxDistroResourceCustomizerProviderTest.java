@@ -23,7 +23,8 @@ class DatafoxDistroResourceCustomizerProviderTest {
     new DatafoxDistroResourceCustomizerProvider().customize(builder);
     builder.customizeModel(model);
     builder.customizeModel(model);
-    ExperimentalResourceDetectionModel detection = ResourceModelAccessor.getDetection(model.getResource());
+    ExperimentalResourceDetectionModel detection =
+        ResourceModelAccessor.getDetection(model.getResource());
     assertNotNull(detection);
     assertEquals(1, detection.getDetectors().size());
     assertEquals("datafox_distro_version", detectorName(detection.getDetectors().get(0)));

@@ -28,7 +28,8 @@ public final class KafkaSpanExporterProvider implements ConfigurableSpanExporter
   public SpanExporter createExporter(ConfigProperties config) {
     String bootstrapServers = config.getString("datafox.exporter.kafka.bootstrap-servers");
     String topic = config.getString("datafox.exporter.kafka.topic");
-    return createExporter(bootstrapServers, topic, config.getMap("datafox.exporter.kafka.producer"));
+    return createExporter(
+        bootstrapServers, topic, config.getMap("datafox.exporter.kafka.producer"));
   }
 
   static SpanExporter createExporter(

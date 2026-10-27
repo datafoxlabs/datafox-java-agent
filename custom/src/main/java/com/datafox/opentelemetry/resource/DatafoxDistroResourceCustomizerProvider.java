@@ -28,7 +28,8 @@ public final class DatafoxDistroResourceCustomizerProvider
             resource = new ResourceModel();
             model.setResource(resource);
           }
-          ExperimentalResourceDetectionModel detection = ResourceModelAccessor.getDetection(resource);
+          ExperimentalResourceDetectionModel detection =
+              ResourceModelAccessor.getDetection(resource);
           if (detection == null) {
             detection = new ExperimentalResourceDetectionModel();
           }

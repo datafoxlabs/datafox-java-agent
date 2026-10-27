@@ -17,6 +17,8 @@ dependencies {
   testImplementation("org.mockito:mockito-core:5.24.0")
   testFixturesApi(project(":testing:common"))
   testImplementation("io.opentelemetry:opentelemetry-sdk")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-extension-declarative-config")
+  testImplementation("io.opentelemetry:opentelemetry-api-incubator")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
 }
 
