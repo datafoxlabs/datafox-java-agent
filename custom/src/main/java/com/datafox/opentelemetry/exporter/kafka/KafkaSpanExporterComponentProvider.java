@@ -6,6 +6,7 @@ package com.datafox.opentelemetry.exporter.kafka;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.api.incubator.config.DeclarativeConfigProperties;
+import io.opentelemetry.sdk.autoconfigure.spi.ConfigurationException;
 import io.opentelemetry.sdk.autoconfigure.spi.internal.ComponentProvider;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.Collections;
@@ -28,6 +29,9 @@ public final class KafkaSpanExporterComponentProvider implements ComponentProvid
   @Override
   public SpanExporter create(DeclarativeConfigProperties config) {
     DeclarativeConfigProperties producer = config.getStructured("producer");
+    if (producer == null && config.getPropertyKeys().contains("producer")) {
+      throw new ConfigurationException("kafka.producer must be a mapping");
+    }
     Map<String, Object> properties =
         producer == null ? Collections.emptyMap() : DeclarativeConfigProperties.toMap(producer);
     return KafkaSpanExporterProvider.createExporter(
