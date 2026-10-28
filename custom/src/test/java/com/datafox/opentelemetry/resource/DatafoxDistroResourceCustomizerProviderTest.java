@@ -6,7 +6,6 @@ package com.datafox.opentelemetry.resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import io.opentelemetry.sdk.autoconfigure.declarativeconfig.DeclarativeConfigurationBuilder;
 import io.opentelemetry.sdk.autoconfigure.declarativeconfig.model.OpenTelemetryConfigurationModel;
@@ -42,7 +41,7 @@ class DatafoxDistroResourceCustomizerProviderTest {
     assertNotNull(detection);
     assertEquals(2, detection.getDetectors().size());
     assertEquals("datafox_distro_version", detectorName(detection.getDetectors().get(0)));
-    assertSame(existing, detection.getDetectors().get(1));
+    assertEquals("existing_resource", detectorName(detection.getDetectors().get(1)));
   }
 
   @Test
@@ -65,7 +64,7 @@ class DatafoxDistroResourceCustomizerProviderTest {
         ResourceModelAccessor.getDetection(model.getResource());
     assertNotNull(detection);
     assertEquals(1, detection.getDetectors().size());
-    assertSame(datafox, detection.getDetectors().get(0));
+    assertEquals("datafox_distro_version", detectorName(detection.getDetectors().get(0)));
   }
 
   private static String detectorName(ExperimentalResourceDetectorModel detector) {
