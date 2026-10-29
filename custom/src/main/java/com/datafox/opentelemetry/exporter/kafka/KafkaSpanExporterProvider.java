@@ -28,7 +28,12 @@ public final class KafkaSpanExporterProvider implements ConfigurableSpanExporter
   public SpanExporter createExporter(ConfigProperties config) {
     String bootstrapServers = config.getString("datafox.exporter.kafka.bootstrap-servers");
     String topic = config.getString("datafox.exporter.kafka.topic");
+    return createExporter(
+        bootstrapServers, topic, config.getMap("datafox.exporter.kafka.producer"));
+  }
 
+  static SpanExporter createExporter(
+      String bootstrapServers, String topic, Map<String, ?> producerProperties) {
     if (bootstrapServers == null || bootstrapServers.trim().isEmpty()) {
       throw new ConfigurationException("datafox.exporter.kafka.bootstrap-servers is required");
     }
@@ -36,8 +41,10 @@ public final class KafkaSpanExporterProvider implements ConfigurableSpanExporter
       throw new ConfigurationException("datafox.exporter.kafka.topic is required");
     }
 
-    Map<String, Object> producerConfig =
-        new HashMap<>(config.getMap("datafox.exporter.kafka.producer"));
+    Map<String, Object> producerConfig = new HashMap<>();
+    if (producerProperties != null) {
+      producerConfig.putAll(producerProperties);
+    }
     producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
     KafkaProducer<String, byte[]> producer =

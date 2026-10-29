@@ -6,6 +6,8 @@ dependencies {
   compileOnly(project(":bootstrap"))
   compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
+  compileOnly("io.opentelemetry:opentelemetry-sdk-extension-declarative-config")
+  compileOnly("io.opentelemetry:opentelemetry-api-incubator")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-internal-logging-simple")
   compileOnly("com.google.auto.service:auto-service")
@@ -15,6 +17,8 @@ dependencies {
   testImplementation("org.mockito:mockito-core:5.24.0")
   testFixturesApi(project(":testing:common"))
   testImplementation("io.opentelemetry:opentelemetry-sdk")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-extension-declarative-config")
+  testImplementation("io.opentelemetry:opentelemetry-api-incubator")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
 }
 

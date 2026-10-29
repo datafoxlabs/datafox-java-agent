@@ -23,6 +23,10 @@ public final class DatafoxDistroResourceProvider implements ResourceProvider {
     return DISTRO_RESOURCE;
   }
 
+  static Resource distroResource() {
+    return DISTRO_RESOURCE;
+  }
+
   @Override
   public int order() {
     return Integer.MAX_VALUE - 1;
